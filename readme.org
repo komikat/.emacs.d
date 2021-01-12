@@ -27,8 +27,8 @@ my non doom emacs config
 (set-face-attribute 'default nil :font "Iosevka" :height 150)
 #+end_src
 ** i use straight now 
-   (defvar bootstrap-version)
 #+begin_src emacs-lisp
+   (defvar bootstrap-version)
    (let ((bootstrap-file
    (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
    (bootstrap-version 5))
