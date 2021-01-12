@@ -2,9 +2,9 @@
 * .emacs.d.vanilla 
 my non doom emacs config
 [WIP]
-
-** visual tweaks
-
+** general settings
+*** visual tweaks
+basic tweaks to make the setup more minimal
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)
@@ -13,221 +13,230 @@ my non doom emacs config
 (set-fringe-mode 10)
 (menu-bar-mode -1)
 #+end_src
-** edit default ring bell to blink mode line instead
+*** bell enhancements
+edit default ring bell to blink mode line instead
 #+begin_src emacs-lisp
 (setq visible-bell nil)
 (setq ring-bell-function (lambda ()
-(invert-face 'mode-line)
-(run-with-timer 0.1 nil 'invert-face 'mode-line)))
+			   (invert-face 'mode-line)
+			   (run-with-timer 0.1 nil 'invert-face 'mode-line)))
 #+end_src
 
-** font
-   
+*** font
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil :font "Iosevka" :height 150)
+(set-face-attribute 'default nil :font "Iosevka"
+		    :height 150)
 #+end_src
-** i use straight now 
+*** package management
+i use straight now 
+**** straight
 #+begin_src emacs-lisp
-   (defvar bootstrap-version)
-   (let ((bootstrap-file
-   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-   (bootstrap-version 5))
-   (unless (file-exists-p bootstrap-file)
-   (with-current-buffer
-   (url-retrieve-synchronously
-   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-   'silent 'inhibit-cookies)
-   (goto-char (point-max))
-   (eval-print-last-sexp)))
-   (load bootstrap-file nil 'nomessage))
+(defvar bootstrap-version)
+(let ((bootstrap-file (expand-file-name "straight/repos/straight.el/bootstrap.el"
+					user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer (url-retrieve-synchronously "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+						     'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 #+end_src
-** init use-package
-   
+**** init use-package
+a better require
 #+begin_src emacs-lisp
 
-   (straight-use-package 'use-package)
-   (setq straight-use-package-by-default t)
-   (setq use-package-always-ensure t)
-
-#+end_src
-** vim keybindings
-#+begin_src emacs-lisp
-   (use-package evil
-   :config
-   (evil-mode 1))
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+(setq use-package-always-ensure t)
 
 #+end_src
-** command-logs nothing much
+*** vim keybindings
+#+BEGIN_QUOTE
+vi vi vi, editor of the beast no
+#+END_QUOTE
+no.
 #+begin_src emacs-lisp
-   (use-package command-log-mode)
+(use-package evil
+  :config (evil-mode 1))
 
 #+end_src
-** completion for life
+*** command-logs
+nothing much
 #+begin_src emacs-lisp
-   (use-package ivy
-   :diminish (ivy-mode . "")
-   :init (ivy-mode 1) ; globally at startup
-   :config
-   (setq ivy-use-virtual-buffers t)
-   (setq ivy-height 10)
-   (setq ivy-count-format "%d/%d "))
+(use-package command-log-mode)
 
 #+end_src
-** reject tradition embrace modernivy
+*** Ivy
+completion for love and life 
+simpler and faster than helm (imo)
 #+begin_src emacs-lisp
-   (use-package counsel
-   :bind* ; load when pressed
-   (("M-x"     . counsel-M-x)
-   ("C-x C-r" . counsel-recentf)  ; search for recently edited
-   ("C-s"     . swiper)
-   ("s-f"     . swiper)
-   ("C-x C-f" . counsel-find-file)
-   ("C-c g"   . counsel-git)      ; search for files in git repo
-   ("C-c j"   . counsel-git-grep) ; search for regexp in git repo
-   ("C-x b"   . counsel-switch-buffer)
-   ("C-x C-b"   . counsel-switch-buffer) ; if i accidently type
-   ("C-c /"   . counsel-ag)       ; Use ag for regexp
-   ("C-x l"   . counsel-locate)
-   ("<f1> f"  . counsel-describe-function)
-   ("<f1> v"  . counsel-describe-variable)
-   ("<f1> l"  . counsel-find-library)
-   ("<f2> i"  . counsel-info-lookup-symbol)
-   ("C-c C-r" . ivy-resume)))
+(use-package ivy
+  :diminish (ivy-mode . ""):init
+  (ivy-mode 1) ; globally at startup
+  :config (setq ivy-use-virtual-buffers t)(setq ivy-height 10)(setq ivy-count-format "%d/%d "))
 
 #+end_src
-** smartparens
+**** counsel commands
+reject tradition embrace modernivy
 #+begin_src emacs-lisp
-   (use-package smartparens
-   :config
-   (require 'smartparens-config)
-   (add-hook 'lisp-mode-hook #'smartparens-strict-mode))
-
+(use-package counsel
+  :bind* ; load when pressed (("M-x"     . counsel-M-x)
+  ("C-x C-r" . counsel-recentf)  ; search for recently edited
+  ("C-s" . swiper)
+  ("s-f" . swiper)
+  ("C-x C-f" . counsel-find-file)
+  ("C-c g" . counsel-git)      ; search for files in git repo
+  ("C-c j" . counsel-git-grep) ; search for regexp in git repo
+  ("C-x b" . counsel-switch-buffer)
+  ("C-x C-b" . counsel-switch-buffer) ; if i accidently type
+  ("C-c /" . counsel-ag)       ; Use ag for regexp
+  ("C-x l" . counsel-locate)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-find-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("C-c C-r" . ivy-resume)))
 
 #+end_src
-** sorting and filtering (magical)
+*** smartparens
+hm, lisp
 #+begin_src emacs-lisp
-   (use-package ivy-prescient
-   :after counsel
-   :config
-   (prescient-persist-mode 1)
-   (ivy-prescient-mode 1))
-
-#+end_src
-** use shift + arrows to move around buffers (very convenient)
-#+begin_src emacs-lisp
-   (windmove-default-keybindings)
-
-#+end_src
-** theme
-#+begin_src emacs-lisp
-   (use-package nord-theme
-   :load-path "~/.emacs.d.vanilla/themes/"
-   :config
-   (load-theme 'nord t))
-
-#+end_src
-** auto completion
-#+begin_src emacs-lisp
-   (use-package company
-   :init
-   (add-hook 'after-init-hook 'global-company-mode))
-
-
-   (use-package company-quickhelp
-   :after company
-   :config
-   (company-quickhelp-mode))
-
-#+end_src
-** eldoc
-#+begin_src emacs-lisp
-   (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
-   (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
-   (add-hook 'ielm-mode-hook 'eldoc-mode)
-
-#+end_src
-** flycheck
-#+begin_src emacs-lisp
-   (use-package flycheck)
-   (add-hook 'after-init-hook #'global-flycheck-mode)
+(use-package smartparens
+  :config (require 'smartparens-config)(add-hook 'lisp-mode-hook #'smartparens-strict-mode))
 
 
 #+end_src
-** smooth scroll
+*** sorting and filtering 
+almost magical
 #+begin_src emacs-lisp
-   (use-package smooth-scrolling
-   :init 
-   (smooth-scrolling-mode 1))
+(use-package ivy-prescient
+  :after counsel
+  :config (prescient-persist-mode 1)(ivy-prescient-mode 1))
+#+end_src
+*** windmove
+shift + arrows to move around buffers, very convenient
+#+begin_src emacs-lisp
+(windmove-default-keybindings)
 
 #+end_src
-** which-key
+*** theme
+theme, yes
 #+begin_src emacs-lisp
-   (use-package which-key)
-   (which-key-mode)
+(use-package nord-theme
+  :load-path "~/.emacs.d.vanilla/themes/"
+  :config (load-theme 'nord t))
 
 #+end_src
-** make ESC quit prompts
+*** auto completion
+i use company because its more popular and has a better API
 #+begin_src emacs-lisp
-   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(use-package company
+  :init (add-hook 'after-init-hook 'global-company-mode))
+#+end_src
+for auto-complete like documentation
+#+begin_src emacs-lisp
+(use-package company-quickhelp
+  :after company
+  :config (company-quickhelp-mode))
+#+end_src
+*** eldoc
+not sure what this does, let me eldoc this
+#+begin_src emacs-lisp
+(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+(add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
+(add-hook 'ielm-mode-hook 'eldoc-mode)
+#+end_src
+*** flycheck
+on the fly checking, better than flymake imo
+#+begin_src emacs-lisp
+(use-package flycheck)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+#+end_src
+*** smooth scroll
+unless you like living in the 70s
+#+begin_src emacs-lisp
+(use-package smooth-scrolling
+  :init (smooth-scrolling-mode 1))
 
 #+end_src
-** magit
+*** which-key
+shows possible completions in the buffer after keystrokes
 #+begin_src emacs-lisp
-   (use-package magit)
+(use-package which-key)
+(which-key-mode)
+#+end_src
+*** make ESC quit prompts
+not sure why this is a heading 
+#+begin_src emacs-lisp
+(global-set-key (kbd "<escape>")
+		'keyboard-escape-quit)
 
 #+end_src
-** neotree
+*** magit
+probably the perfect git client to exist
 #+begin_src emacs-lisp
-   (use-package neotree
-   :config
-   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-   (setq neo-smart-open t)
-   )
+(use-package magit)
+#+end_src
+*** neotree
+vim inspired but useful ;)
+#+begin_src emacs-lisp
+(use-package neotree
+  :config (setq neo-theme (if (display-graphic-p)
+			      'icons
+			    'arrow))(setq neo-smart-open t))
 
 
-   (use-package all-the-icons)
+(use-package all-the-icons)
 
 #+end_src
-** projectile
+*** projectile
+quick project navigation
 #+begin_src emacs-lisp
-   (use-package projectile
-   :config
-   :bind (("s-p" . projectile-command-map)
-   ("C-c f" . projectile-find-file-hook))
-   )
+(use-package projectile
+  :config
+  :bind (("s-p" . projectile-command-map)
+	 ("C-c f" . projectile-find-file-hook))
+  )
+
+(projectile-mode 1)
+#+end_src
+*** org
+the mode in which this file is written, i use org mode for this config
+#+begin_src emacs-lisp
+(require 'org-tempo) ; useful org shortcuts
+#+end_src
+*** colored parens
+lots of irritating superfluous parentheses
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters) ;rainbow uwu
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 #+end_src
-** colored parens
+** language specific settings 
+*** TODO eglot
+planing to use eglot for c++ and rust
 #+begin_src emacs-lisp
-   (use-package rainbow-delimiters)
-   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-
-   (projectile-mode 1)
-   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(use-package eglot)
+(add-to-list 'eglot-server-programs
+	     '((c++-mode c-mode) "clangd-11"))
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c-mode-hook 'eglot-ensure)
 
 #+end_src
 
-** TODO eglot
+*** python
+elpy is probably the perfect python environment, minimal and nimble.
 #+begin_src emacs-lisp
-   (use-package eglot)
-   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd-11"))
-   (add-hook 'c-mode-hook 'eglot-ensure)
-   (add-hook 'c-mode-hook 'eglot-ensure)
+(use-package elpy)
+(elpy-enable)
+(when (load "flycheck" t t)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook 'flycheck-mode))
 
-#+end_src
-
-
-** python
-#+begin_src emacs-lisp
-   (use-package elpy)
-   (elpy-enable)
-   (when (load "flycheck" t t)
-   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-   (add-hook 'elpy-mode-hook 'flycheck-mode))
-
-   (add-hook 'elpy-mode-hook (lambda ()
-   (add-hook 'before-save-hook
-   'elpy-format-code nil t)))
+(add-hook 'elpy-mode-hook
+	  (lambda ()
+	    (add-hook 'before-save-hook 'elpy-format-code
+		      nil t)))
 
 #+end_src
