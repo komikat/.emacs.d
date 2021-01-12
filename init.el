@@ -13,7 +13,7 @@
 (run-with-timer 0.1 nil 'invert-face 'mode-line)))
 
 ;; font
-(set-face-attribute 'default nil :font "SF Mono" :height 150)
+(set-face-attribute 'default nil :font "Iosevka" :height 150)
 
 ;; i use straight now 
 (defvar bootstrap-version)
@@ -51,22 +51,25 @@
   (setq ivy-height 10)
   (setq ivy-count-format "%d/%d "))
 
+;; reject tradition embrace modernivy
 (use-package counsel
   :bind* ; load when pressed
   (("M-x"     . counsel-M-x)
-   ("C-s"     . swiper)
-   ("C-x C-f" . counsel-find-file)
    ("C-x C-r" . counsel-recentf)  ; search for recently edited
+   ("C-s"     . swiper)
+   ("s-f"     . swiper)
+   ("C-x C-f" . counsel-find-file)
    ("C-c g"   . counsel-git)      ; search for files in git repo
    ("C-c j"   . counsel-git-grep) ; search for regexp in git repo
+   ("C-x b"   . counsel-switch-buffer)
+   ("C-x C-b"   . counsel-switch-buffer) ; if i accidently type
    ("C-c /"   . counsel-ag)       ; Use ag for regexp
    ("C-x l"   . counsel-locate)
-   ("C-x C-f" . counsel-find-file)
    ("<f1> f"  . counsel-describe-function)
    ("<f1> v"  . counsel-describe-variable)
    ("<f1> l"  . counsel-find-library)
    ("<f2> i"  . counsel-info-lookup-symbol)
-   ("C-c C-r" . ivy-resume)))  
+   ("C-c C-r" . ivy-resume)))
 
 ;; smartparens
 (use-package smartparens
@@ -76,13 +79,11 @@
 
 
 ;; sorting and filtering (magical)
-(use-package prescient
-  :straight t
-  :preface
-  (eval-when-compile
-    (declare-function prescient-persist-mode nil))
+(use-package ivy-prescient
+  :after counsel
   :config
-  (prescient-persist-mode t))
+  (prescient-persist-mode 1)
+  (ivy-prescient-mode 1))
 
 ;; use shift + arrows to move around buffers (very convenient)
 (windmove-default-keybindings)
@@ -129,9 +130,44 @@
 ;; magit
 (use-package magit)
 
+;; neotree
+(use-package neotree
+  :config
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (setq neo-smart-open t)
+)
+
+
+(use-package all-the-icons)
+
+;; projectile
+(use-package projectile
+  :config
+  :bind (("s-p" . projectile-command-map)
+	 ("C-c f" . projectile-find-file-hook))
+  )
+
+;; colored parens
+(use-package rainbow-delimiters)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+
+(projectile-mode 1)
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
+
 ;; =========================================
 ;; ========= Dev Environment setup =========
 ;; =========================================
+
+;; eglot
+(use-package eglot)
+(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd-11"))
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c-mode-hook 'eglot-ensure)
+
+
+
 
 ;; python
 (use-package elpy)
@@ -145,4 +181,3 @@
                                       'elpy-format-code nil t)))
 
 
-;; elisp
