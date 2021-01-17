@@ -1,9 +1,37 @@
-
 * .emacs.d.vanilla 
 my non doom emacs config
-[WIP]
-** general settings
-*** visual tweaks
+** TODO general settings
+*** TODO theme
+theme, yes
+#+begin_src emacs-lisp
+(use-package nord-theme
+  :load-path "~/.emacs.d.vanilla/themes/"
+  :config (load-theme 'nord t))
+
+#+end_src
+*** TODO neotree
+vim inspired but useful ;;
+#+begin_src emacs-lisp
+(use-package neotree
+  :config (setq neo-theme (if (display-graphic-p)
+			      'icons
+			    'arrow))(setq neo-smart-open t))
+
+
+(use-package all-the-icons)
+
+#+end_src
+*** TODO undo-tree
+*** TODO org
+the mode in which this file is written, i use org mode for this config
+#+begin_src emacs-lisp
+(require 'org-tempo) ; useful org shortcuts
+(setq org-ellipsis "⤵")
+
+(use-package org-bullets)
+(org-bullets-mode)
+#+end_src
+*** DONE visual tweaks
 basic tweaks to make the setup more minimal
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)
@@ -12,8 +40,11 @@ basic tweaks to make the setup more minimal
 (tooltip-mode -1)
 (set-fringe-mode 10)
 (menu-bar-mode -1)
+
+;; fullscreen causes weird child windows issues
+(toggle-frame-maximized)
 #+end_src
-*** bell enhancements
+*** DONE bell enhancements
 edit default ring bell to blink mode line instead
 #+begin_src emacs-lisp
 (setq visible-bell nil)
@@ -22,12 +53,12 @@ edit default ring bell to blink mode line instead
 			   (run-with-timer 0.1 nil 'invert-face 'mode-line)))
 #+end_src
 
-*** font
+*** DONE font
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :font "Iosevka"
 		    :height 150)
 #+end_src
-*** package management
+*** DONE package management
 i use straight now 
 **** straight
 #+begin_src emacs-lisp
@@ -41,6 +72,7 @@ i use straight now
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
 #+end_src
 **** init use-package
 a better require
@@ -51,7 +83,7 @@ a better require
 (setq use-package-always-ensure t)
 
 #+end_src
-*** vim keybindings
+*** DONE vim keybindings
 #+BEGIN_QUOTE
 vi vi vi, editor of the beast no
 #+END_QUOTE
@@ -61,27 +93,41 @@ no.
   :config (evil-mode 1))
 
 #+end_src
-*** command-logs
+*** DONE command-logs
 nothing much
 #+begin_src emacs-lisp
 (use-package command-log-mode)
 
 #+end_src
-*** Ivy
+*** DONE Ivy
 completion for love and life 
-simpler and faster than helm (imo)
+simpler and faster than helm
 #+begin_src emacs-lisp
 (use-package ivy
   :diminish (ivy-mode . ""):init
   (ivy-mode 1) ; globally at startup
   :config (setq ivy-use-virtual-buffers t)(setq ivy-height 10)(setq ivy-count-format "%d/%d "))
 
+;; sublime like postframe
+
+(use-package ivy-posframe)
+
+;; Different command can use different display function.
+(setq ivy-posframe-display-functions-alist
+      '((swiper          . ivy-posframe-display-at-point)
+        (complete-symbol . ivy-posframe-display-at-point)
+        (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+        (t               . ivy-posframe-display)))
+(ivy-posframe-mode 1)
+(setq ivy-posframe-parameters
+      '((left-fringe . 8)
+        (right-fringe . 8)))
 #+end_src
 **** counsel commands
 reject tradition embrace modernivy
 #+begin_src emacs-lisp
 (use-package counsel
-  :bind* ; load when pressed (("M-x"     . counsel-M-x)
+  :bind* ; load when pressed ("M-x"     . counsel-M-x)
   ("C-x C-r" . counsel-recentf)  ; search for recently edited
   ("C-s" . swiper)
   ("s-f" . swiper)
@@ -96,10 +142,10 @@ reject tradition embrace modernivy
   ("<f1> v" . counsel-describe-variable)
   ("<f1> l" . counsel-find-library)
   ("<f2> i" . counsel-info-lookup-symbol)
-  ("C-c C-r" . ivy-resume)))
+)
 
 #+end_src
-*** smartparens
+*** DONE smartparens
 hm, lisp
 #+begin_src emacs-lisp
 (use-package smartparens
@@ -107,28 +153,20 @@ hm, lisp
 
 
 #+end_src
-*** sorting and filtering 
+*** DONE sorting and filtering 
 almost magical
 #+begin_src emacs-lisp
 (use-package ivy-prescient
   :after counsel
   :config (prescient-persist-mode 1)(ivy-prescient-mode 1))
 #+end_src
-*** windmove
+*** DONE windmove
 shift + arrows to move around buffers, very convenient
 #+begin_src emacs-lisp
 (windmove-default-keybindings)
 
 #+end_src
-*** theme
-theme, yes
-#+begin_src emacs-lisp
-(use-package nord-theme
-  :load-path "~/.emacs.d.vanilla/themes/"
-  :config (load-theme 'nord t))
-
-#+end_src
-*** auto completion
+*** DONE auto completion
 i use company because its more popular and has a better API
 #+begin_src emacs-lisp
 (use-package company
@@ -136,61 +174,54 @@ i use company because its more popular and has a better API
 #+end_src
 for auto-complete like documentation
 #+begin_src emacs-lisp
-(use-package company-quickhelp
-  :after company
-  :config (company-quickhelp-mode))
+  ;; (use-package company-quickhelp
+  ;;   :after company
+  ;;   :config (company-quickhelp-mode))
+ 
+  (use-package company-posframe
+    :after company)
+    (company-posframe-mode 1)
+
 #+end_src
-*** eldoc
+*** DONE eldoc
 not sure what this does, let me eldoc this
 #+begin_src emacs-lisp
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
 (add-hook 'ielm-mode-hook 'eldoc-mode)
 #+end_src
-*** flycheck
+*** DONE flycheck
 on the fly checking, better than flymake imo
 #+begin_src emacs-lisp
 (use-package flycheck)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 #+end_src
-*** smooth scroll
+*** DONE smooth scroll
 unless you like living in the 70s
 #+begin_src emacs-lisp
 (use-package smooth-scrolling
   :init (smooth-scrolling-mode 1))
 
 #+end_src
-*** which-key
+*** DONE which-key
 shows possible completions in the buffer after keystrokes
 #+begin_src emacs-lisp
 (use-package which-key)
 (which-key-mode)
 #+end_src
-*** make ESC quit prompts
-not sure why this is a heading 
+*** DONE make ESC quit prompts
+    not sure why this is a heading 
 #+begin_src emacs-lisp
 (global-set-key (kbd "<escape>")
 		'keyboard-escape-quit)
 
 #+end_src
-*** magit
+*** DONE magit
 probably the perfect git client to exist
 #+begin_src emacs-lisp
 (use-package magit)
 #+end_src
-*** neotree
-vim inspired but useful ;)
-#+begin_src emacs-lisp
-(use-package neotree
-  :config (setq neo-theme (if (display-graphic-p)
-			      'icons
-			    'arrow))(setq neo-smart-open t))
-
-
-(use-package all-the-icons)
-
-#+end_src
-*** projectile
+*** DONE projectile
 quick project navigation
 #+begin_src emacs-lisp
 (use-package projectile
@@ -201,19 +232,24 @@ quick project navigation
 
 (projectile-mode 1)
 #+end_src
-*** org
-the mode in which this file is written, i use org mode for this config
-#+begin_src emacs-lisp
-(require 'org-tempo) ; useful org shortcuts
-#+end_src
-*** colored parens
+*** DONE colored parens
 lots of irritating superfluous parentheses
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters) ;rainbow uwu
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 #+end_src
-** language specific settings 
+*** DONE term
+    #+begin_src emacs-lisp
+    (use-package vterm)
+    
+    #+end_src
+*** DONE electric-pair
+    #+begin_src emacs-lisp
+      (electric-pair-mode)
+
+    #+end_src
+** TODO language specific settings 
 *** TODO eglot
 planing to use eglot for c++ and rust
 #+begin_src emacs-lisp
@@ -225,18 +261,32 @@ planing to use eglot for c++ and rust
 
 #+end_src
 
-*** python
+*** DONE python
 elpy is probably the perfect python environment, minimal and nimble.
 #+begin_src emacs-lisp
-(use-package elpy)
-(elpy-enable)
-(when (load "flycheck" t t)
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-  (add-hook 'elpy-mode-hook 'flycheck-mode))
 
-(add-hook 'elpy-mode-hook
-	  (lambda ()
-	    (add-hook 'before-save-hook 'elpy-format-code
-		      nil t)))
+  (use-package pyenv-mode)
+  (use-package elpy
+    :ensure t
+    :init
+    (elpy-enable)
+    :config
+    (pyenv-mode))
+
+  ;; use flycheck instead of flymake
+  (when (load "flycheck" t t)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+  ;; autoformat on save
+  (add-hook 'elpy-mode-hook
+	    (lambda ()
+	      (add-hook 'before-save-hook 'elpy-format-code
+			nil t)))
+  (define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
+  (define-key global-map (kbd "C-c o") 'iedit-mode)		  
+
+  (setq elpy-rpc-virtualenv-path 'default)
+  (setq elpy-rpc-python-command "python3")
 
 #+end_src

@@ -2,12 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("init.el"
- (filename . "~/.emacs.d.vanilla/init.el")
- (front-context-string . ";; visual tweaks")
+(("readme.org"
+ (filename . "~/.emacs.d.vanilla/readme.org")
+ (front-context-string . "\n* .emacs.d.vani")
  (rear-context-string)
  (position . 1))
-("init.el<2>"
+("init.el"
  (filename . "~/.emacs.d.vanilla/init.el")
  (front-context-string . ";; visual tweaks")
  (rear-context-string)
