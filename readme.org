@@ -2,8 +2,8 @@
 
 .emacs.d.vanilla 
   my non doom emacs config
-** TODO general settings
-*** DONE package management
+** general settings
+*** package management
     i use straight now 
 **** straight
 #+begin_src emacs-lisp
@@ -102,7 +102,7 @@ the mode in which this file is written, i use org mode for this config
   (global-set-key (kbd "C-c c") 'org-capture)
   (global-set-key (kbd "C-c C-c") 'org-capture)
 #+end_src
-*** DONE visual tweaks
+*** visual tweaks
 basic tweaks to make the setup more minimal
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)
@@ -120,18 +120,18 @@ basic tweaks to make the setup more minimal
 ;; organise backups
 (setq backup-directory-alist '(("." . "~/.config/emacs/backups")))
 #+end_src
-*** DONE bell enhancements
+*** bell enhancements
 edit default ring bell to blink mode line instead
 #+begin_src emacs-lisp
 (setq visible-bell nil)
 #+end_src
 
-*** DONE font
+*** font
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :font "Iosevka"
 		    :height 150)
 #+end_src
-*** DONE vim keybindings
+*** vim keybindings
 #+BEGIN_QUOTE
 vi vi vi, editor of the beast no
 #+END_QUOTE
@@ -153,13 +153,13 @@ no.
   (evil-collection-init))
 
 #+end_src
-*** DONE command-logs
+*** command-logs
 nothing much
 #+begin_src emacs-lisp
 (use-package command-log-mode)
 
 #+end_src
-*** DONE counsel commands
+*** counsel commands
 reject tradition embrace modernivy
 #+begin_src emacs-lisp
   (use-package counsel
@@ -182,7 +182,7 @@ reject tradition embrace modernivy
   )
 
 #+end_src
-*** DONE Ivy
+*** Ivy
 completion for love and life 
 simpler and faster than helm
 #+begin_src emacs-lisp
@@ -210,7 +210,7 @@ simpler and faster than helm
 
 (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 #+end_src
-*** DONE smartparens
+*** smartparens
 hm, lisp
 #+begin_src emacs-lisp
 (use-package smartparens
@@ -218,14 +218,14 @@ hm, lisp
 
 
 #+end_src
-*** DONE sorting and filtering 
+*** sorting and filtering 
 almost magical
 #+begin_src emacs-lisp
 (use-package ivy-prescient
   :after counsel
   :config (prescient-persist-mode 1)(ivy-prescient-mode 1)(message "prescient loaded"))
 #+end_src
-*** DONE windmove
+*** windmove
 shift + arrows to move around buffers, very convenient
 #+begin_src emacs-lisp
   (windmove-default-keybindings)
@@ -233,7 +233,7 @@ shift + arrows to move around buffers, very convenient
   
 
 #+end_src
-*** DONE auto completion
+*** auto completion
 i use company because its more popular and has a better API
 #+begin_src emacs-lisp
 (use-package company
@@ -250,7 +250,7 @@ for auto-complete like documentation
     (company-posframe-mode 1)
 
 #+end_src
-*** DONE eldoc
+*** eldoc
     not sure what this does, let me eldoc this
 #+begin_src emacs-lisp
   (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
@@ -258,38 +258,38 @@ for auto-complete like documentation
   (add-hook 'ielm-mode-hook 'eldoc-mode)
   (add-hook 'python-mode-hook 'eldoc-mode)
 #+end_src
-*** DONE flycheck
+*** flycheck
 on the fly checking, better than flymake imo
 #+begin_src emacs-lisp
 (use-package flycheck)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 #+end_src
-*** DONE smooth scroll
+*** smooth scroll
 unless you like living in the 70s
 #+begin_src emacs-lisp
 (use-package smooth-scrolling
   :init (smooth-scrolling-mode 1))
 
 #+end_src
-*** DONE which-key
+*** which-key
 shows possible completions in the buffer after keystrokes
 #+begin_src emacs-lisp
 (use-package which-key)
 (which-key-mode)
 #+end_src
-*** DONE make ESC quit prompts
+*** make ESC quit prompts
     not sure why this is a heading 
 #+begin_src emacs-lisp
 (global-set-key (kbd "<escape>")
 		'keyboard-escape-quit)
 
 #+end_src
-*** DONE magit
+*** magit
 probably the perfect git client to exist
 #+begin_src emacs-lisp
 (use-package magit)
 #+end_src
-*** DONE projectile
+*** projectile
 quick project navigation
 #+begin_src emacs-lisp
 (use-package projectile
@@ -300,19 +300,19 @@ quick project navigation
 
 (projectile-mode 1)
 #+end_src
-*** DONE colored parens
+*** colored parens
 lots of irritating superfluous parentheses
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters) ;rainbow uwu
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 #+end_src
-*** DONE term
+*** term
     #+begin_src emacs-lisp
     (use-package vterm)
     
     #+end_src
-*** DONE electric-pair
+*** electric-pair
     #+begin_src emacs-lisp
       (electric-pair-mode)
 
@@ -346,7 +346,7 @@ lots of irritating superfluous parentheses
     #+end_src
  
     
-** TODO language specific settings 
+** language specific settings 
 *** lsp
     #+begin_src emacs-lisp
 	  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
@@ -377,7 +377,7 @@ planing to use eglot for c++ and rust
 
 #+end_src
 
-*** DONE python
+*** python
 elpy is probably the perfect python environment, minimal and nimble.
 #+begin_src emacs-lisp
 
