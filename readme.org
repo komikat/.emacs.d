@@ -1,4 +1,6 @@
-* .emacs.d.vanilla 
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+
+.emacs.d.vanilla 
   my non doom emacs config
 ** TODO general settings
 *** DONE package management
