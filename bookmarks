@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("readme.org"
+(("org-capture-last-stored"
+ (filename . "~/Documents/orgfiles/i.org")
+ (front-context-string . "** TESTING ORG-C")
+ (rear-context-string . "\n* Blog Topics:\n")
+ (position . 78))
+("readme.org"
  (filename . "~/.emacs.d.vanilla/readme.org")
  (front-context-string . "\n* .emacs.d.vani")
  (rear-context-string)

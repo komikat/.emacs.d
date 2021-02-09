@@ -47,7 +47,7 @@ vim inspired but useful ;;
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-nord t)
+  (load-theme 'doom-one t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -79,6 +79,26 @@ the mode in which this file is written, i use org mode for this config
   (use-package org-bullets)
   (add-hook 'org-mode-hook 'org-bullets-mode)
   (org-bullets-mode)
+  (setq org-directory "~/Documents/orgfiles")
+
+  ;; org capture
+  (setq org-default-notes-file (concat org-directory "~/Documents/orgfiles/notes.org"))
+
+
+
+   (setq org-capture-templates
+	  '(("n" "Note" entry (file+headline "~/Documents/orgfiles/notes.org" "Notes")
+	     "* Note %?\n%T")
+	    ("l" "Link" entry (file+headline "~/Documents/orgfiles/links.org" "Links")
+	     "* %? %^L %^g \n%T" :prepend t)
+	    ("b" "Blog idea" entry (file+headline "~/Documents/orgfiles/i.org" "Blog Topics:")
+	     "* %?\n%T" :prepend t)
+	    ("t" "To Do Item" entry (file+headline "~/Documents/orgfiles/i.org" "To Do Items")
+	     "* %?\n%T" :prepend t)
+	    ))
+
+  (global-set-key (kbd "C-c c") 'org-capture)
+  (global-set-key (kbd "C-c C-c") 'org-capture)
 #+end_src
 *** DONE visual tweaks
 basic tweaks to make the setup more minimal
@@ -115,8 +135,20 @@ vi vi vi, editor of the beast no
 #+END_QUOTE
 no.
 #+begin_src emacs-lisp
+
 (use-package evil
-  :config (evil-mode 1))
+  :ensure t
+  :init
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
 
 #+end_src
 *** DONE command-logs
@@ -194,7 +226,9 @@ almost magical
 *** DONE windmove
 shift + arrows to move around buffers, very convenient
 #+begin_src emacs-lisp
-(windmove-default-keybindings)
+  (windmove-default-keybindings)
+
+  
 
 #+end_src
 *** DONE auto completion
@@ -281,6 +315,22 @@ lots of irritating superfluous parentheses
       (electric-pair-mode)
 
     #+end_src
+*** diff hl
+ #+begin_src emacs-lisp
+      (use-package diff-hl)
+      (global-diff-hl-mode)
+
+      (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+      (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+      (fringe-mode 8)
+    #+end_src
+    
+*** undo-tree
+   
+    #+begin_src emacs-lisp
+      (use-package undo-tree)
+      (global-undo-tree-mode)
+    #+end_src
 *** flyspell
     #+begin_src emacs-lisp
     ;;https://www.tenderisthebyte.com/blog/2019/06/09/spell-checking-emacs/
@@ -293,6 +343,7 @@ lots of irritating superfluous parentheses
     
     #+end_src
  
+    
 ** TODO language specific settings 
 *** lsp
     #+begin_src emacs-lisp
@@ -310,6 +361,8 @@ lots of irritating superfluous parentheses
       ;; default very low
       (setq read-process-output-max (* 1024 1024))
 
+      (add-hook 'c-mode-hook 'lsp)
+      (add-hook 'c++-mode-hook 'lsp)
 
     #+end_src
 *** TODO eglot
@@ -318,7 +371,6 @@ planing to use eglot for c++ and rust
 (use-package eglot)
 (add-to-list 'eglot-server-programs
 	     '((c++-mode c-mode) "clangd"))
-(add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c-mode-hook 'eglot-ensure)
 
 #+end_src
@@ -352,6 +404,13 @@ elpy is probably the perfect python environment, minimal and nimble.
   (setq elpy-rpc-python-command "python3")
 
 #+end_src
+
+*** sml 
+    #+begin_src emacs-lisp
+    (use-package sml-mode)
+    #+end_src
+(setenv "PATH" (concat "/usr/local/smlnj/bin:" (getenv "PATH")))
+(setq exec-path (cons "/usr/local/smlnj/bin"  exec-path))
 
 *** javascript-typescript
     i use the excellent TIDE mode
@@ -402,4 +461,15 @@ elpy is probably the perfect python environment, minimal and nimble.
     :hook ((typescript-mode . tide-setup)
 	   (typescript-mode . tide-hl-identifier-mode)
 	   (before-save . tide-format-before-save)))
+
+;; vue
+(use-package vue-mode)
+(use-package vue-mode
+  :mode "\\.vue\\'"
+  :hook (vue-mode . prettier-js-mode)
+  :config
+  (add-hook 'vue-mode-hook #'lsp)
+  (setq prettier-js-args '("--parser vue")))
+
 #+end_src
+
