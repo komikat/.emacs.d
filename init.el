@@ -1,13 +1,21 @@
+;;; init.el --- Initialization file for Emacs
+
 ;; basic cosmetic changes
+(setq inhibit-startup-message t)
+(scroll-bar-mode -1)
+(tooltip-mode -1)
+(fringe-mode 0)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 
+;; line numbers, native!
+(global-display-line-numbers-mode)
+
 ;; better key mappings for mac
-;; i dont use linux (as of yet) so no point checking for OS
+;; i dont use linux (yet) -- no point checking for OS
 (setq mac-command-modifier 'meta)
 (setq mac-option-modifier 'super)
 (setq mac-control-modifier 'control)
-(setq ns-function-modifier 'hyper)
 
 ;; Install straight.el
 (defvar bootstrap-version)
@@ -23,13 +31,18 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-
 ;; install use-package
 (straight-use-package 'use-package)
 
 ;; Configure use-package to use straight.el by default
 (use-package straight
   :custom (straight-use-package-by-default t))
+
+;; font
+(set-frame-font "Jetbrains Mono 12" nil t)
+
+;; fullscreen on macos
+(toggle-frame-fullscreen)
 
 ;; selectrum
 (use-package selectrum
@@ -52,28 +65,6 @@
   (selectrum-prescient-mode +1)
   (prescient-persist-mode +1))
 
-
-;; company mode
-(use-package corfu
-  ;; Optional customizations
-  :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  (corfu-scroll-margin 5)        ;; Use scroll margin
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode))
-
 ;; A few more useful configurations...
 (use-package emacs
   :init
@@ -89,11 +80,22 @@
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
 
-
 ;; install flycheck
 (use-package flycheck
   :init
-  (global-flycheck-mode))
+  (global-flycheck-mode)
+  :config
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+)
+
+;; better scrolling
+(setq scroll-conservatively 101)
+
+;; optional if you want which-key integration
+(use-package which-key
+    :config
+    (which-key-mode))
+
 
 
 
@@ -101,25 +103,89 @@
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (XXX-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil
+	lsp-modeline-diagnostics-enable nil
+	lsp-diagnostics-provider :none
+	)
+  (setq lsp-disabled-clients '(clangd))
+  
+  :hook ((python-mode . lsp)
+		 (c-mode . lsp)
+		 (c++-mode . lsp)
+		 (lsp-mode . lsp-enable-which-key-integration))
+  :commands
+         lsp)
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
-
-;; optional if you want which-key integration
-(use-package which-key
-    :config
-    (which-key-mode))
-
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
 (setq lsp-idle-delay 0.500)
 (setq lsp-use-plists t)
 
+;; company mode
+(use-package company
+  :bind (:map company-active-map
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))
+  :init
+  (global-company-mode)
+  :config
+  (setq company-idle-delay 0.1)
+)
+
+;;electric-pair
+(electric-pair-mode t)
+
+;; tab width
+(setq-default tab-width 4)
+
+;; better c defaults
+(setq c-default-style "linux"
+          c-basic-offset 4)
+
+;; theme
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
+(use-package nord-theme
+  :config
+  (load-theme 'nord t))
+
+;; projectile
+(use-package projectile
+  :config
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-project-search-path '(("~/Developer" . 3) ("~/" . 1))))
+
+
+;; neotree
+(use-package neotree
+  :ensure t)
+
+;; disable ring bell
+(setq ring-bell-function 'ignore)
+
+;; sidekick
+(straight-use-package
+ '(sidekick :type git :host github :repo "VernonGrant/sidekick.el"))
+(require 'sidekick)
+
+;; Set some default bindings.
+(global-set-key (kbd "C-c k") 'sidekick-at-point)
+(global-set-key (kbd "C-c K") 'sidekick-focus-toggle)
+(global-set-key (kbd "C-c C-k") 'sidekick-search-for-literal)
+
+;; vterm
+(use-package vterm
+  :ensure t)
+
+;; magit
+(use-package magit
+  :ensure t)
+
+(add-hook 'python-mode-hook #'flycheck-python-setup)
 
 
 (custom-set-variables
@@ -134,3 +200,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
