@@ -39,7 +39,7 @@
   :custom (straight-use-package-by-default t))
 
 ;; font
-(set-frame-font "Jetbrains Mono 12" nil t)
+(set-frame-font "Jetbrains Mono 15" nil t)
 
 ;; fullscreen on macos
 ;;(toggle-frame-fullscreen)
