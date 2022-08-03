@@ -42,7 +42,7 @@
 (set-frame-font "Jetbrains Mono 12" nil t)
 
 ;; fullscreen on macos
-(toggle-frame-fullscreen)
+;;(toggle-frame-fullscreen)
 
 ;; selectrum
 (use-package selectrum
@@ -108,7 +108,7 @@
 	lsp-modeline-diagnostics-enable nil
 	lsp-diagnostics-provider :none
 	)
-  (setq lsp-disabled-clients '(clangd))
+  ;;(setq lsp-disabled-clients '(clangd))
   
   :hook ((python-mode . lsp)
 		 (c-mode . lsp)
