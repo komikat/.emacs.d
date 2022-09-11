@@ -42,7 +42,7 @@
 (set-frame-font "Jetbrains Mono 12" nil t)
 
 ;; fullscreen on macos
-(toggle-frame-fullscreen)
+;;(toggle-frame-fullscreen)
 
 ;; selectrum
 (use-package selectrum
@@ -146,10 +146,14 @@
           c-basic-offset 4)
 
 ;; theme
-(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-(use-package nord-theme
-  :config
-  (load-theme 'nord t))
+(setq modus-themes-mode-line '(accented borderless padded))
+(setq modus-themes-region '(bg-only))
+(setq modus-themes-completions 'opinionated)
+(setq modus-themes-bold-constructs t)
+(setq modus-themes-italic-constructs t)
+(setq modus-themes-paren-match '(bold intense))
+(load-theme 'modus-vivendi)
+
 
 ;; projectile
 (use-package projectile
@@ -187,7 +191,8 @@
 
 (add-hook 'python-mode-hook #'flycheck-python-setup)
 
-
+(defun display-startup-echo-area-message ()
+  (message (format "Emacs took %s seconds to boot up." (emacs-init-time))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
