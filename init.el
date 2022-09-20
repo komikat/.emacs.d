@@ -96,9 +96,6 @@
     :config
     (which-key-mode))
 
-
-
-
 (use-package lsp-mode
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
@@ -108,7 +105,6 @@
 	lsp-modeline-diagnostics-enable nil
 	lsp-diagnostics-provider :none
 	)
-  (setq lsp-disabled-clients '(clangd))
   
   :hook ((python-mode . lsp)
 		 (c-mode . lsp)
