@@ -185,6 +185,11 @@
 (use-package magit
   :ensure t)
 
+
+;; haskell setup
+(use-package haskell-mode
+  :ensure t)
+
 (add-hook 'python-mode-hook #'flycheck-python-setup)
 
 (defun display-startup-echo-area-message ()
@@ -201,4 +206,3 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
