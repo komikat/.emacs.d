@@ -41,8 +41,13 @@
 ;; font
 (set-frame-font "Jetbrains Mono 12" nil t)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :init
+  (exec-path-from-shell-initialize))
+
 ;; fullscreen on macos
-;;(toggle-frame-fullscreen)
+;; (toggle-frame-fullscreen)
 
 ;; selectrum
 (use-package selectrum
@@ -91,27 +96,23 @@
 ;; better scrolling
 (setq scroll-conservatively 101)
 
-;; optional if you want which-key integration
-(use-package which-key
-    :config
-    (which-key-mode))
-
 (use-package lsp-mode
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
-  :config
-  (setq lsp-headerline-breadcrumb-enable nil
-	lsp-modeline-diagnostics-enable nil
-	lsp-diagnostics-provider :none
-	)
-  
-  :hook ((python-mode . lsp)
-		 (c-mode . lsp)
-		 (c++-mode . lsp)
-		 (lsp-mode . lsp-enable-which-key-integration))
-  :commands
-         lsp)
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (python-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+
+(use-package lsp-ui :commands lsp-ui-mode)
+
+;; optional if you want which-key integration
+(use-package which-key
+    :config
+    (which-key-mode))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -144,7 +145,6 @@
 ;; theme
 (setq modus-themes-mode-line '(accented borderless padded))
 (setq modus-themes-region '(bg-only))
-(setq modus-themes-completions 'opinionated)
 (setq modus-themes-bold-constructs t)
 (setq modus-themes-italic-constructs t)
 (setq modus-themes-paren-match '(bold intense))
@@ -170,6 +170,7 @@
 ;; sidekick
 (straight-use-package
  '(sidekick :type git :host github :repo "VernonGrant/sidekick.el"))
+
 (require 'sidekick)
 
 ;; Set some default bindings.
@@ -185,15 +186,49 @@
 (use-package magit
   :ensure t)
 
-
 ;; haskell setup
 (use-package haskell-mode
-  :ensure t)
+  :ensure t
+)
 
 (add-hook 'python-mode-hook #'flycheck-python-setup)
 
+
 (defun display-startup-echo-area-message ()
   (message (format "Emacs took %s seconds to boot up." (emacs-init-time))))
+
+(use-package racket-mode
+  :ensure t
+  :init
+  (setq racket-program "racket"))
+
+(use-package paredit
+  :ensure t
+  :init
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-)
+  )
+
+
+
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
+(use-package multiple-cursors
+  :ensure t)
+
+(defun bruh (n)
+  "bruh moment"
+  (message n))
+
+(pixel-scroll-precision-mode t)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
