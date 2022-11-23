@@ -39,7 +39,7 @@
   :custom (straight-use-package-by-default t))
 
 ;; font
-(set-frame-font "Jetbrains Mono 12" nil t)
+(set-frame-font "Iosevka 14" nil t) ;; iosevka ftw
 
 (use-package exec-path-from-shell
   :ensure t
@@ -224,11 +224,15 @@
 (use-package multiple-cursors
   :ensure t)
 
-(defun bruh (n)
-  "bruh moment"
-  (message n))
+(pixel-scroll-precision-mode t) ;; emacs 29 only!
 
-(pixel-scroll-precision-mode t)
+ (defun transparency (value)
+   "Sets the transparency of the frame window. 0=transparent/100=opaque"
+   (interactive "nTransparency Value 0 - 100 opaque:")
+   (set-frame-parameter (selected-frame) 'alpha value)) ;;https://www.emacswiki.org/emacs/TransparentEmacs
+
+(transparency 0.9)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
