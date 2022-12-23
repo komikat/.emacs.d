@@ -39,7 +39,7 @@
   :custom (straight-use-package-by-default t))
 
 ;; font
-(set-frame-font "Jetbrains Mono 15" nil t)
+(set-frame-font "Iosevka 18" nil t)
 
 ;; fullscreen on macos
 ;;(toggle-frame-fullscreen)
@@ -147,9 +147,9 @@
 
 ;; theme
 (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-(use-package nord-theme
-  :config
-  (load-theme 'nord t))
+
+(load-theme 'modus-vivendi)
+
 
 ;; projectile
 (use-package projectile
@@ -184,6 +184,12 @@
 ;; magit
 (use-package magit
   :ensure t)
+
+(use-package yaml-mode
+  :ensure t)
+(add-hook 'yaml-mode-hook
+          (lambda ()
+            (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
 
 (add-hook 'python-mode-hook #'flycheck-python-setup)
 
