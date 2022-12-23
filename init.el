@@ -39,7 +39,7 @@
   :custom (straight-use-package-by-default t))
 
 ;; font
-(set-frame-font "Iosevka 14" nil t) ;; iosevka ftw
+(set-frame-font "Iosevka 18" nil t) ;; iosevka ftw
 
 (use-package exec-path-from-shell
   :ensure t
@@ -224,7 +224,7 @@
 (use-package multiple-cursors
   :ensure t)
 
-(pixel-scroll-precision-mode t) ;; emacs 29 only!
+; (pixel-scroll-precision-mode t) ;; emacs 29 only! not on arch 
 
  (defun transparency (value)
    "Sets the transparency of the frame window. 0=transparent/100=opaque"
