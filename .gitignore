@@ -9,3 +9,10 @@
 /projectile-bookmarks.eld
 /projectile.cache
 /transient/
+*.el#
+/.cache/
+/.mc-lists.el
+/projects
+/racket-mode/
+/timelog
+/tramp
