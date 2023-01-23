@@ -1,4 +1,5 @@
 ;;; init.el --- Initialization file for Emacs
+
 ;; basic cosmetic changes
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)
@@ -115,19 +116,57 @@
 ;; better scrolling
 (setq scroll-conservatively 101)
 
+;; company mode -- moved to corfu
+(use-package corfu
+  :straight (:files (:defaults "extensions/*"))
+  :bind
+  ("<escape>" . corfu-quit)
+  ("SPC" . corfu-insert-separator)
+  :custom
+  (corfu-cycle t)		;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)		;; Enable auto completion
+  (corfu-separator ?\s)	;; Orderless field separator
+  (corfu-quit-at-boundary nil) ;; Never quit at completion boundary
+  (corfu-quit-no-match nil)	;; Never quit, even if there is no match
+  (corfu-preselect-first t)      ;; Preselect the prompt
+  (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  (corfu-scroll-margin 0) ;; Use scroll margin
+  (corfu-min-width 80)
+  (corfu-max-width corfu-min-width)       ; Always have the same width
+  (corfu-count 10)
+  (corfu-echo-documentation t)
+  (tab-always-indent 'complete) ;; tab doesnt indent when completing
+  (completion-cycle-threshold nil)
+  (corfu-quit-at-boundary 'separator)     ; a non-nil value is necessary
+  (corfu-separator ?\s)                   ; Use space
+  (corfu-quit-no-match 'separator) ; Don't quit if there is `corfu-separator' inserted
+  (corfu-preview-current 'insert)  ; Preview current candidate?
+  (corfu-popupinfo-mode t)
+  
+  (defun kb/corfu-setup-lsp ()
+	"Use orderless completion style with lsp-capf instead of the
+  default lsp-passthrough."
+	(setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless)))
+  :init
+  (global-corfu-mode)
+)
+
 (use-package lsp-mode
+  :after corfu
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-disabled-clients '(jsts-ls deno-ls))
   (setq lsp-keymap-prefix "C-c l")
   :hook
-  (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-   (python-mode . lsp)
-   ;; if you want which-key integration
-   (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+  (lsp-mode . lsp-enable-which-key-integration)
+  :commands lsp
+  )
+
 
 (use-package lsp-ui :commands lsp-ui-mode)
 ;; optional if you want which-key integration
+
 
 (use-package which-key
   :config
@@ -152,25 +191,19 @@
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
-;; company mode -- moved to corfu
-(use-package corfu
+
+
+(use-package kind-icon
+  :after corfu
   :custom
-  (corfu-cycle t)		;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)		;; Enable auto completion
-  (corfu-separator ?\s)	;; Orderless field separator
-  (corfu-quit-at-boundary nil) ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)	;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;;(corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  (corfu-scroll-margin 5) ;; Use scroll margin
+  (kind-icon-use-icons t)
+  (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
+  (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
+  (kind-icon-blend-frac 0.08)
 
-  :init
-  (global-corfu-mode)
-
-  )
-
-
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
+)
 
 ;;electric-pair
 (electric-pair-mode t)
@@ -299,7 +332,7 @@
 ;; roam setup
 (setq org-default-notes-file "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/notes.org")
 (use-package org-roam)
-(setq org-roam-directory "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/")
+(setq org-roam-directory "~/Documents/org/zettel")
 (org-roam-db-autosync-mode)
 
 (use-package org-roam-ui)
@@ -314,8 +347,19 @@
   (deft-directory org-roam-directory))
 
 ;; javascsript stuff
+(use-package js2-mode)
 (use-package rjsx-mode)
 
+
+(use-package vi-tilde-fringe
+  :init
+  (fringe-mode)
+  :custom
+  (add-hook 'prog-mode-hook 'vi-tilde-fringe-mode))
+
+(use-package diff-hl
+  :custom
+  (diff-hl-mode))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
