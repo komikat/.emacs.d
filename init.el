@@ -44,13 +44,15 @@
   (straight-use-package-by-default t))
 
 ;; font
-(set-frame-font "Iosevka 14" nil t)
+;; (set-frame-font "PragmataPro Mono Liga 12" nil t)
+;; (set-frame-font "PragmataPro 13" nil t)
+(set-frame-font "Iosevka 12" nil t)
+
 (custom-theme-set-faces
-   'user
-   '(variable-pitch ((t (:family "Helvetica Neue" :height 180 :weight Light)))))
+ 'user
+ '(variable-pitch ((t (:family "Helvetica Neue" :height 180 :weight Light)))))
 
 
-;; iosevka ftw
 (use-package exec-path-from-shell
   :init
   (exec-path-from-shell-initialize))
@@ -100,7 +102,7 @@
 
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
+)
 
 
 
@@ -118,10 +120,11 @@
 
 ;; company mode -- moved to corfu
 (use-package corfu
+  :hook (lsp-completion-mode . kb/corfu-setup-lsp)
   :straight (:files (:defaults "extensions/*"))
   :bind
-  ("<escape>" . corfu-quit)
-  ("SPC" . corfu-insert-separator)
+  (("<escape>" . corfu-quit)
+   ("SPC" . corfu-insert-separator))
   :custom
   (corfu-cycle t)		;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)		;; Enable auto completion
@@ -135,14 +138,15 @@
   (corfu-max-width corfu-min-width)       ; Always have the same width
   (corfu-count 10)
   (corfu-echo-documentation t)
-  (tab-always-indent 'complete) ;; tab doesnt indent when completing
   (completion-cycle-threshold nil)
   (corfu-quit-at-boundary 'separator)     ; a non-nil value is necessary
   (corfu-separator ?\s)                   ; Use space
   (corfu-quit-no-match 'separator) ; Don't quit if there is `corfu-separator' inserted
   (corfu-preview-current 'insert)  ; Preview current candidate?
   (corfu-popupinfo-mode t)
-  
+  (lsp-completion-provider :none)
+
+  :config
   (defun kb/corfu-setup-lsp ()
 	"Use orderless completion style with lsp-capf instead of the
   default lsp-passthrough."
@@ -151,6 +155,42 @@
   :init
   (global-corfu-mode)
 )
+
+(use-package cape
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  :bind (("C-c p p" . completion-at-point) ;; capf
+         ("C-c p t" . complete-tag)        ;; etags
+         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
+         ("C-c p h" . cape-history)
+         ("C-c p f" . cape-file)
+         ("C-c p k" . cape-keyword)
+         ("C-c p s" . cape-symbol)
+         ("C-c p a" . cape-abbrev)
+         ("C-c p i" . cape-ispell)
+         ("C-c p l" . cape-line)
+         ("C-c p w" . cape-dict)
+         ("C-c p \\" . cape-tex)
+         ("C-c p _" . cape-tex)
+         ("C-c p ^" . cape-tex)
+         ("C-c p &" . cape-sgml)
+         ("C-c p r" . cape-rfc1345))
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+)
+
 
 (use-package lsp-mode
   :after corfu
@@ -210,6 +250,13 @@
 
 ;; tab width
 (setq-default tab-width 4)
+(setq tab-width 4)
+
+(add-hook 'python-mode-hook
+      (lambda ()
+        (setq indent-tabs-mode t)
+        (setq tab-width 4)
+        (setq python-indent-offset 4)))
 
 ;; better c defaults
 (setq c-default-style "linux"
@@ -238,6 +285,7 @@
 			  'projectile-command-map)
   (setq projectile-project-search-path
 		'(("~/Developer" . 3)
+		  ("~/Documents/" . 5)
 		  ("~/" . 1))))
 
 ;; neotree
@@ -350,27 +398,178 @@
 (use-package js2-mode)
 (use-package rjsx-mode)
 
+(defun web-mode-init-hook ()
+  "Hooks for Web mode.  Adjust indent."
+  (setq web-mode-markup-indent-offset 2))
+  
+(use-package web-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode))
+;  (add-to-list 'auto-mode-alist '("\\.tsx?$" . web-mode))
+  (add-hook 'web-mode-hook  'web-mode-init-hook)
+  :custom
+  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+  (setq web-mode-content-types-alist '(("tlsx" . "\\.ts[x]?\\'")))
+  )
+
 
 (use-package vi-tilde-fringe
   :init
   (fringe-mode)
-  :custom
+  :config
   (add-hook 'prog-mode-hook 'vi-tilde-fringe-mode))
 
 (use-package diff-hl
-  :custom
+  :config
   (diff-hl-mode))
+
+;; code formatting
+(use-package apheleia
+  :config
+  (add-to-list 'apheleia-mode-alist '(typescriptreact-mode . prettier-typescript))
+  (apheleia-global-mode +1)
+  )
+
+
+(use-package avy
+  :config
+  (global-set-key (kbd "C-z") 'avy-goto-char-2))
+
+;; ew
+(use-package vue-mode)
+
+;; irc stuff
+(setq url-proxy-services
+      '(("http"     . "proxy2.iiit.ac.in:80")))
+
+(setq erc-server "irc.libera.chat"
+      erc-nick "komikat"    ; Change this!
+      erc-user-full-name "Akshit Kumar"  ; And this!
+      erc-track-shorten-start 8
+      erc-autojoin-channels-alist '(("irc.libera.chat" "#haskell" "#emacs"))
+      erc-kill-buffer-on-part t
+            erc-auto-query 'bury)
+(setq erc-hide-list '("JOIN" "PART" "QUIT"))
+
+;; dont use these anymore tbvh
+
+;; tree sitter
+;; https://vxlabs.com/2022/06/12/typescript-development-with-emacs-tree-sitter-and-lsp-in-2022/
+(use-package tree-sitter
+  :ensure t
+  :config
+  ;; activate tree-sitter on any buffer containing code for which it has a parser available
+  (global-tree-sitter-mode)
+  ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
+  ;; by switching on and off
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
+(use-package typescript-mode
+  :after tree-sitter
+  :config
+  ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
+  ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
+  (define-derived-mode typescriptreact-mode typescript-mode
+    "TypeScript TSX")
+
+  ;; use our derived mode for tsx files
+  (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
+  ;; by default, typescript-mode is mapped to the treesitter typescript parser
+  ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
+
+(use-package tsi
+  :after tree-sitter
+  :straight (tsi :host github :repo "orzechowskid/tsi.el")
+  ;; define autoload definitions which when actually invoked will cause package to be loaded
+  :commands (tsi-typescript-mode tsi-json-mode tsi-css-mode)
+  :init
+  (add-hook 'typescript-mode-hook (lambda () (tsi-typescript-mode 1)))
+  (add-hook 'json-mode-hook (lambda () (tsi-json-mode 1)))
+  (add-hook 'css-mode-hook (lambda () (tsi-css-mode 1)))
+  (add-hook 'scss-mode-hook (lambda () (tsi-scss-mode 1))))
+
+(setq tsi-typescript-indent-offset 4)
+
+(use-package embark
+  :ensure t
+
+  :bind
+  (("C-." . embark-act)        
+   ("C-;" . embark-dwim)       
+   ("C-h B" . embark-bindings)))
+
+(use-package org-download)
+(add-hook 'dired-mode-hook 'org-download-enable)
+
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
+
+(use-package slime)
+(setq inferior-lisp-program "sbcl")
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(warning-suppress-types
-   '((comp))))
+ '(apheleia-formatters
+   '((bean-format "bean-format")
+	 (black "black" "-")
+	 (brittany "brittany")
+	 (clang-format "clang-format" "-assume-filename"
+				   (or
+					(buffer-file-name)
+					(cdr
+					 (assoc major-mode
+							'((c-mode . ".c")
+							  (c++-mode . ".cpp")
+							  (cuda-mode . ".cu")
+							  (protobuf-mode . ".proto"))))
+					".c"))
+	 (crystal-tool-format "crystal" "tool" "format" "-")
+	 (dart-format "dart" "format")
+	 (elm-format "elm-format" "--yes" "--stdin")
+	 (fish-indent "fish_indent")
+	 (gofmt "gofmt")
+	 (gofumpt "gofumpt")
+	 (goimports "goimports")
+	 (google-java-format "google-java-format" "-")
+	 (isort "isort" "-")
+	 (lisp-indent . apheleia-indent-lisp-buffer)
+	 (ktlint "ktlint" "--stdin" "-F")
+	 (latexindent "latexindent" "--logfile=/dev/null")
+	 (mix-format "mix" "format" "-")
+	 (nixfmt "nixfmt")
+	 (ocamlformat "ocamlformat" "-" "--name" filepath "--enable-outside-detected-project")
+	 (phpcs "apheleia-phpcs")
+	 (prettier npx "prettier" "--stdin-filepath" filepath)
+	 (prettier-css npx "prettier" "--stdin-filepath" filepath "--parser=css")
+	 (prettier-html npx "prettier" "--stdin-filepath" filepath "--parser=html")
+	 (prettier-graphql npx "prettier" "--stdin-filepath" filepath "--parser=graphql")
+	 (prettier-javascript npx "prettier" "--stdin-filepath" filepath "--parser=babel-flow")
+	 (prettier-json npx "prettier" "--stdin-filepath" filepath "--parser=json")
+	 (prettier-markdown npx "prettier" "--stdin-filepath" filepath "--parser=markdown")
+	 (prettier-ruby npx "prettier" "--stdin-filepath" filepath "--parser=ruby")
+	 (prettier-scss npx "prettier" "--stdin-filepath" filepath "--parser=scss")
+	 (prettier-typescript npx "prettier" "--tab-width 4" "--use-tabs" "--stdin-filepath" filepath "--parser=typescript")
+	 (prettier-yaml npx "prettier" "--stdin-filepath" filepath "--parser=yaml")
+	 (shfmt "shfmt" "-i" "4")
+	 (stylua "stylua" "-")
+	 (rustfmt "rustfmt" "--quiet" "--emit" "stdout")
+	 (terraform "terraform" "fmt" "-")))
+ '(tsi-typescript-indent-offset 4))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(variable-pitch ((t (:family "Helvetica Neue" :height 180 :weight Light)))))
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
