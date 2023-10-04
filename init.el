@@ -43,6 +43,7 @@
 (show-paren-mode t)
 
 ;; tab width setup
+(setq indent-tabs-mode nil)
 (setq-default tab-width 4)
 (setq tab-width 4)
 
@@ -93,7 +94,12 @@
 ;; (set-frame-font "PragmataPro 12" nil t)
 ;; (set-frame-font "Inconsolata 12" nil t)
 ;; (set-frame-font "Overpass Mono 12")
-(set-frame-font "Iosevka 12")
+;; (set-frame-font "-*-Iosevka-regular-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+;; (set-frame-font "-*-Hack-regular-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+(set-frame-font "-*-Inconsolata Condensed-regular-normal-condensed-*-15-*-*-*-m-0-iso10646-1")
+
+
+;; (set-frame-font "Hack 12")
 ;; (set-frame-font "JuliaMono 12" nil t)
 
 (use-package diminish
@@ -135,14 +141,31 @@
   ("C-r" . 'consult-line))
 
 
-;; install flycheck
 (use-package flycheck
-  :init
-  (global-flycheck-mode)
   :config
-  (setq-default flycheck-disabled-checkers
-				'(emacs-lisp-checkdoc))
-  )
+  (flycheck-define-checker python-ruff
+    "A Python syntax and style checker using the ruff utility.
+    To override the path to the ruff executable, set
+    `flycheck-python-ruff-executable'.
+    See URL `http://pypi.python.org/pypi/ruff'."
+    :command ("ruff"
+              "--format=text"
+              (eval (when buffer-file-name
+                      (concat "--stdin-filename=" buffer-file-name)))
+              "-")
+    :standard-input t
+    :error-filter (lambda (errors)
+                    (let ((errors (flycheck-sanitize-errors errors)))
+                      (seq-map #'flycheck-flake8-fix-error-level errors)))
+    :error-patterns
+    ((warning line-start
+              (file-name) ":" line ":" (optional column ":") " "
+              (id (one-or-more (any alpha)) (one-or-more digit)) " "
+              (message (one-or-more not-newline))
+              line-end))
+    :modes python-mode)
+  (add-to-list 'flycheck-checkers 'python-ruff)
+  :init (global-flycheck-mode))
 
 ;; better scrolling
 (setq scroll-conservatively 101)
@@ -247,7 +270,6 @@
 (use-package apheleia
   :config
   (add-to-list 'apheleia-mode-alist '(typescriptreact-mode . prettier-typescript))
-  (apheleia-global-mode +1)
   )
 
 (use-package avy
@@ -327,3 +349,78 @@
    (format "Emacs took %s seconds to boot up."
 		   (emacs-init-time))))
 
+(use-package cider)
+(use-package lsp-mode)
+
+(use-package lsp-jedi
+  :ensure t
+  :config
+  (with-eval-after-load "lsp-mode"
+    (add-to-list 'lsp-disabled-clients 'pyls)
+    (add-to-list 'lsp-enabled-clients 'jedi)
+	(add-to-list 'lsp-enabled-clients 'clangd)))
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1)
+
+(use-package ace-window)
+(global-set-key (kbd "C-x o") 'ace-window)
+
+;; org roam setup
+(use-package org-roam)
+(setq org-roam-directory "~/Documents/roam")
+
+(org-roam-db-autosync-mode)
+
+;; jupyter setup
+;;; jupyter
+(use-package
+  jupyter)
+
+;;; code cells
+(use-package code-cells
+  :config
+  (let ((map code-cells-mode-map))
+    (define-key map (kbd "C-c <up>") 'code-cells-backward-cell)
+    (define-key map (kbd "C-c <down>") 'code-cells-forward-cell)
+    (define-key map (kbd "M-<up>") 'code-cells-move-cell-up)
+    (define-key map (kbd "M-<down>") 'code-cells-move-cell-down)
+    (define-key map (kbd "C-c C-c") 'code-cells-eval)
+    ;; Overriding other minor mode bindings requires some insistence...
+    (define-key map [remap jupyter-eval-line-or-region] 'code-cells-eval)))
+;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+
+;; Major mode for OCaml programming
+(use-package tuareg
+  :ensure t
+  :mode (("\\.ocamlinit\\'" . tuareg-mode)))
+
+;; Major mode for editing Dune project files
+(use-package dune
+  :ensure t)
+
+;; Merlin provides advanced IDE features
+(use-package merlin
+  :ensure t
+  :config
+  (add-hook 'tuareg-mode-hook #'merlin-mode)
+  (add-hook 'merlin-mode-hook #'company-mode)
+  ;; we're using flycheck instead
+  (setq merlin-error-after-save nil))
+
+(use-package merlin-eldoc
+  :ensure t
+  :hook ((tuareg-mode) . merlin-eldoc-setup))
+
+;; This uses Merlin internally
+(use-package flycheck-ocaml
+  :ensure t
+  :config
+  (flycheck-ocaml-setup))
+
+(use-package pdf-tools)
