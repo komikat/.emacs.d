@@ -168,6 +168,9 @@
    (c-mode . c-ts-mode)))
 ;;; TREE SITTER END
 
+(setq python-shell-interpreter "ipython"
+      python-shell-interpreter-args "-i --simple-prompt")
+
 (use-package which-key
   :init (which-key-mode 1))
 
@@ -176,10 +179,36 @@
 
 (use-package haskell-mode)
 (use-package eglot
+  :ensure t
+  :defer t
+  :bind (:map eglot-mode-map
+              ("C-c C-d" . eldoc)
+              ("C-c C-e" . eglot-rename)
+              ("C-c C-o" . python-sort-imports)
+              ("C-c C-f" . eglot-format-buffer))
+  :hook ((python-mode . eglot-ensure)
+         (python-mode . flyspell-prog-mode)
+         (python-mode . superword-mode)
+         (python-mode . hs-minor-mode)
+         (python-mode . (lambda () (set-fill-column 88))))
   :config
-  (add-to-list 'eglot-server-programs 
-             '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
-  )
+  (setq-default eglot-workspace-configuration
+                '((:pylsp . (:configurationSources ["flake8"]
+                             :plugins (
+                                       :pycodestyle (:enabled :json-false)
+                                       :mccabe (:enabled :json-false)
+                                       :pyflakes (:enabled :json-false)
+                                       :flake8 (:enabled :json-false
+                                                :maxLineLength 88)
+                                       :ruff (:enabled t
+                                              :lineLength 88)
+                                       :pydocstyle (:enabled t
+                                                    :convention "numpy")
+                                       :yapf (:enabled :json-false)
+                                       :autopep8 (:enabled :json-false)
+                                       :black (:enabled t
+                                               :line_length 88
+                                               :cache_config t)))))))
 
 (use-package racket-mode)
 (use-package paredit
@@ -210,5 +239,75 @@
 
 (use-package magit)
 
+(use-package pdf-tools
+  :config
+  (pdf-tools-install))
+
+(add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+(use-package latex-preview-pane)
+
+(use-package org-noter)
+
+(use-package rainbow-delimiters
+  :config
+  (rainbow-delimiters-mode t)
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+
+(use-package bufler
+  :init (bufler-mode)
+  :bind ("C-x C-b" . bufler)
+)
+
+;; elfeed config
+(use-package elfeed
+  :bind ("C-x w" . elfeed)
+  :init ;; Somewhere in your .emacs file
+  (setq elfeed-feeds
+      '(("http://nullprogram.com/feed/" blog emacs)
+        ("https://www.reddit.com/user/nxlyd/m/compsci.rss")
+        ("https://hnrss.org/frontpage"))
+      )
+  )
+
+(use-package devdocs
+  :bind ("C-h D" . devdocs-lookup))
+
+(use-package ein)
+
+(use-package gptel
+  :config
+  (setq gptel-api-key (getenv "OPENAPI")))
+
+(use-package solaire-mode
+  :hook (after-init . solaire-global--mode))
+
+(use-package golden-ratio
+  :config
+  (golden-ratio-mode 1))
+
+(use-package spacious-padding
+  :config
+  (spacious-padding-mode 1))
+
+(use-package haskell-mode)
+
+
+(load "~/.emacs.d/.ercpass")
+(use-package erc
+  :config
+  (setq erc-prompt-for-nickserv-password nil)
+  (setq erc-nickserv-passwords
+        `((freenode     (("komikat" . ,freenode-nickone-pass)))))
+  (setq erc-nick "komikat"
+        erc-user-full-name "Akshit Kumar")
+  )
+
+(defun connect-znc ()
+  (interactive)
+  (erc :server "localhost"
+       :port   "1025"
+       :user "akshitkr"
+       :password znc-pass))
 
 ;; init.el ends here
