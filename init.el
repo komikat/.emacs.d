@@ -81,6 +81,9 @@
         modus-themes-mixed-fonts t)
 
   (set-frame-font "Iosevka 12")
+  (add-to-list 'default-frame-alist
+             '(font . "Iosevka 12"))
+
 
   (load-theme 'modus-vivendi)
   (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
@@ -99,7 +102,8 @@
   (delete-selection-mode t)             ; delete selection when typing
   (global-hl-line-mode -1)              ; on the fence
   (show-paren-mode t)                   ; NEED
-  (global-display-line-numbers-mode 0)  ; do i REALLY need line numbers? not sure. 
+  (global-display-line-numbers-mode t)  ; do i REALLY need line numbers? not sure.
+  (setq display-line-numbers-type 'relative)
 
   ;; tab width stuff
   (setq-default indent-tabs-mode nil)     ; use spaces!
@@ -110,7 +114,14 @@
   (setq mac-option-modifier 'super
         mac-command-modifier 'meta
         mac-right-option-modifier 'none)
+  
+  :hook (emacs-startup . (lambda ()
+                           (custom-set-faces
+                            '(line-number ((t (:inherit default :font "Iosevka")))))))
 )
+
+
+ 
 
 (use-package orderless
   :init
@@ -210,7 +221,9 @@
                                                :line_length 88
                                                :cache_config t)))))))
 
-(use-package racket-mode)
+(use-package racket-mode
+  :hook (racket-mode . racket-xp-mode))
+
 (use-package paredit
   :ensure t
   :config
@@ -232,7 +245,7 @@
 (use-package projectile
   :init
   (projectile-mode +1)
-  (setq projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2) ("~/Documents/College/" . 2) ("~/Documents/College/3-2/" . 2)))
+  (setq projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2)))
   :bind (:map projectile-mode-map
               ("M-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
@@ -293,22 +306,21 @@
 
 (use-package haskell-mode)
 
+(load "~/.emacs.d/.ercpass")
+(use-package erc
+  :config
+  (setq erc-prompt-for-nickserv-password nil)
+  (setq erc-nickserv-passwords
+        `((freenode     (("komikat" . ,freenode-nickone-pass)))))
+  (setq erc-nick "komikat"
+        erc-user-full-name "Akshit Kumar")
+  )
 
-;; (load "~/.emacs.d/.ercpass")
-;; (use-package erc
-;;   :config
-;;   (setq erc-prompt-for-nickserv-password nil)
-;;   (setq erc-nickserv-passwords
-;;         `((freenode     (("komikat" . ,freenode-nickone-pass)))))
-;;   (setq erc-nick "komikat"
-;;         erc-user-full-name "Akshit Kumar")
-;;   )
-
-;; (defun connect-znc ()
-;;   (interactive)
-;;   (erc :server "localhost"
-;;        :port   "1025"
-;;        :user "akshitkr"
-;;        :password znc-pass)) 
+(defun connect-znc ()
+  (interactive)
+  (erc :server "localhost"
+       :port   "1025"
+       :user "akshitkr"
+       :password znc-pass)) 
 
 ;; init.el ends here
