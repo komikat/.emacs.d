@@ -237,7 +237,8 @@
               ("M-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
 
-(use-package magit)
+(use-package magit
+  :bind ("C-x g" . magit))
 
 (use-package pdf-tools
   :config
@@ -246,7 +247,7 @@
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 (use-package latex-preview-pane)
 
-(use-package org-noter)
+; (use-package org-noter)
 
 (use-package rainbow-delimiters
   :config
@@ -293,21 +294,21 @@
 (use-package haskell-mode)
 
 
-(load "~/.emacs.d/.ercpass")
-(use-package erc
-  :config
-  (setq erc-prompt-for-nickserv-password nil)
-  (setq erc-nickserv-passwords
-        `((freenode     (("komikat" . ,freenode-nickone-pass)))))
-  (setq erc-nick "komikat"
-        erc-user-full-name "Akshit Kumar")
-  )
+;; (load "~/.emacs.d/.ercpass")
+;; (use-package erc
+;;   :config
+;;   (setq erc-prompt-for-nickserv-password nil)
+;;   (setq erc-nickserv-passwords
+;;         `((freenode     (("komikat" . ,freenode-nickone-pass)))))
+;;   (setq erc-nick "komikat"
+;;         erc-user-full-name "Akshit Kumar")
+;;   )
 
-(defun connect-znc ()
-  (interactive)
-  (erc :server "localhost"
-       :port   "1025"
-       :user "akshitkr"
-       :password znc-pass))
+;; (defun connect-znc ()
+;;   (interactive)
+;;   (erc :server "localhost"
+;;        :port   "1025"
+;;        :user "akshitkr"
+;;        :password znc-pass)) 
 
 ;; init.el ends here
