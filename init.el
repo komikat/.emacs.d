@@ -82,7 +82,7 @@
 
   (set-frame-font "Iosevka 12")
   (add-to-list 'default-frame-alist
-             '(font . "Iosevka 12"))
+               '(font . "Iosevka 12"))
 
 
   (load-theme 'modus-vivendi)
@@ -294,7 +294,7 @@
   (setq gptel-api-key (getenv "OPENAPI")))
 
 (use-package solaire-mode
-  :hook (after-init . solaire-global--mode))
+  :hook (after-init . solaire-global-mode))
 
 (use-package golden-ratio
   :config
@@ -322,5 +322,17 @@
        :port   "1025"
        :user "akshitkr"
        :password znc-pass)) 
+
+(use-package ligature
+  :config
+  ;; Enable all Iosevka ligatures in programming modes
+  (ligature-set-ligatures 'prog-mode '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->" "<---->" "<!--"
+                                       "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---"
+                                       "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!=" "===" "!=="
+                                       ":=" ":-" ":+" "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))
+  ;; Enables ligature checks globally in all buffers. You can also do it
+  ;; per mode with `ligature-mode'.
+  (global-ligature-mode t))
+
 
 ;; init.el ends here
