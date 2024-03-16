@@ -245,7 +245,7 @@
 (use-package projectile
   :init
   (projectile-mode +1)
-  (setq projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2)))
+  (setq projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2) ("/Users/akshitkr/Library/Mobile Documents/com~apple~CloudDocs/Documents/College/" . 3)))
   :bind (:map projectile-mode-map
               ("M-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
@@ -321,7 +321,12 @@
   (erc :server "localhost"
        :port   "1025"
        :user "akshitkr"
-       :password znc-pass)) 
+       :password znc-pass))
+
+(defun connect-without-znc ()
+  (interactive)
+  (erc :server "irc.libera.chat"
+       :port "6697"))
 
 (use-package ligature
   :config
@@ -333,6 +338,19 @@
   ;; Enables ligature checks globally in all buffers. You can also do it
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
+
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+(use-package lsp-haskell
+  :config
+  (setq lsp-haskell-server-path "/Users/akshitkr/Library/Mobile Documents/com~apple~CloudDocs/Documents/College/3-2/gsoc/hls/dist-newstyle/build/aarch64-osx/ghc-9.8.1/haskell-language-server-2.7.0.0/x/haskell-language-server/build/haskell-language-server/haskell-language-server"))
 
 
 ;; init.el ends here
