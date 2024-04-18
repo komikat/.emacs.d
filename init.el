@@ -42,12 +42,29 @@
 ;;; VERTICO BEGIN
 (use-package vertico
   :init
-  (vertico-mode))
+  (vertico-mode)
+  :config (setq vertico-preselect 'first))
 
 (use-package savehist
   :init
   (savehist-mode))
 
+(use-package modus-themes
+  :init
+  (setq modus-themes-italic-constructs t
+        modus-themes-bold-constructs nil
+        modus-themes-region '(bg-only no-extend))
+  (setq modus-themes-common-palette-overrides
+        '((fg-prompt cyan)
+          (bg-prompt bg-cyan-nuanced)))
+  :config
+  (setq modus-themes-to-toggle '(modus-vivendi modus-operandi-tritanopia))
+  (setq modus-themes-prompts '(regular))
+  (set-face-attribute 'default nil
+                      :font "Hasklig")
+  (load-theme 'modus-vivendi)
+  (define-key global-map (kbd "<f5>") #'modus-themes-toggle))
+  
 ;; A few more useful configurations...
 (use-package emacs
   :init
@@ -76,38 +93,28 @@
   (setq enable-recursive-minibuffers t)
   :config
   ;; THEME BEGIN
-  (setq modus-themes-italic-constructs t
-        modus-themes-bold-constructs t
-        modus-themes-mixed-fonts t)
 
-  (set-frame-font "Iosevka 12")
-  (add-to-list 'default-frame-alist
-               '(font . "Iosevka 12"))
-
-
-  (load-theme 'modus-vivendi)
-  (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
   ;; THEME END
 
   ;; basic cosmetic changes
-  (pixel-scroll-precision-mode t)       ; emacs 29 - in the future now
-  (setq ring-bell-function 'ignore)     ; so annoying
-  (setq inhibit-startup-message t)      ; ^^
-  (scroll-bar-mode -1)                  ; the scroll thing on the right
-  (tooltip-mode -1)                     ; eh
-  (fringe-mode 0)                       ; the fringe
-  (menu-bar-mode t)                     ; love it - the top thing on mac
-  (tool-bar-mode -1)                    ; nah
-  (recentf-mode 1)                      ; recent files
-  (delete-selection-mode t)             ; delete selection when typing
-  (global-hl-line-mode -1)              ; on the fence
-  (show-paren-mode t)                   ; NEED
-  (global-display-line-numbers-mode t)  ; do i REALLY need line numbers? not sure.
+  (pixel-scroll-precision-mode t)     ; emacs 29 - in the future now
+  (setq ring-bell-function 'ignore)   ; so annoying
+  (setq inhibit-startup-message t)    ; ^^
+  (scroll-bar-mode -1)                ; the scroll thing on the right
+  (tooltip-mode -1)                   ; eh
+  (fringe-mode 0)                     ; the fringe
+  (menu-bar-mode t)                   ; love it - the top thing on mac
+  (tool-bar-mode -1)                  ; nah
+  (recentf-mode 1)                    ; recent files
+  (delete-selection-mode t)           ; delete selection when typing
+  (global-hl-line-mode -1)            ; on the fence
+  (show-paren-mode t)                 ; NEED
+  (global-display-line-numbers-mode t) ; do i REALLY need line numbers? not sure.
   (setq display-line-numbers-type 'relative)
 
   ;; tab width stuff
-  (setq-default indent-tabs-mode nil)     ; use spaces!
-  (setq-default tab-width 4)              ; 4 spaces for 1 tab
+  (setq-default indent-tabs-mode nil)   ; use spaces!
+  (setq-default tab-width 4)            ; 4 spaces for 1 tab
   (setq tab-width 4)
 
   ;; mac keybinds
@@ -117,8 +124,8 @@
   
   :hook (emacs-startup . (lambda ()
                            (custom-set-faces
-                            '(line-number ((t (:inherit default :font "Iosevka")))))))
-)
+                            '(line-number ((t (:inherit default :font "Hasklig")))))))
+  )
 
 
  
@@ -222,7 +229,9 @@
                                                :cache_config t)))))))
 
 (use-package racket-mode
-  :hook (racket-mode . racket-xp-mode))
+  :hook (racket-mode . racket-xp-mode)
+  :config
+  (setq racket-eldoc-function 'racket-xp-eldoc-function))
 
 (use-package paredit
   :ensure t
@@ -287,8 +296,6 @@
 (use-package devdocs
   :bind ("C-h D" . devdocs-lookup))
 
-(use-package ein)
-
 (use-package gptel
   :config
   (setq gptel-api-key (getenv "OPENAPI")))
@@ -319,7 +326,7 @@
 (defun connect-znc ()
   (interactive)
   (erc :server "localhost"
-       :port   "1025"
+       :port   "1200"
        :user "akshitkr"
        :password znc-pass))
 
@@ -328,29 +335,63 @@
   (erc :server "irc.libera.chat"
        :port "6697"))
 
-(use-package ligature
-  :config
-  ;; Enable all Iosevka ligatures in programming modes
-  (ligature-set-ligatures 'prog-mode '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->" "<---->" "<!--"
-                                       "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---"
-                                       "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!=" "===" "!=="
-                                       ":=" ":-" ":+" "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))
-  ;; Enables ligature checks globally in all buffers. You can also do it
-  ;; per mode with `ligature-mode'.
-  (global-ligature-mode t))
+;; (use-package ligature
+;;   :config
+;;   ;; Enable all Iosevka ligatures in programming modes
+;;   (ligature-set-ligatures 'prog-mode '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->" "<---->" "<!--"
+;;                                        "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---"
+;;                                        "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!=" "===" "!=="
+;;                                        ":=" ":-" ":+" "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))
+;;   ;; Enables ligature checks globally in all buffers. You can also do it
+;;   ;; per mode with `ligature-mode'.
+;;   (global-ligature-mode t))
+
+(use-package hasklig-mode
+  :hook (haskell-mode))
 
 (use-package lsp-mode
   :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
+  :hook ((lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
 
 (use-package lsp-haskell
   :config
-  (setq lsp-haskell-server-path "/Users/akshitkr/Library/Mobile Documents/com~apple~CloudDocs/Documents/College/3-2/gsoc/hls/dist-newstyle/build/aarch64-osx/ghc-9.8.1/haskell-language-server-2.7.0.0/x/haskell-language-server/build/haskell-language-server/haskell-language-server"))
+  (setq lsp-haskell-server-path "/Users/akshitkr/.ghcup/bin/haskell-language-server-wrapper"))
+
+(use-package lsp-ui)
+(use-package moody)
+
+;; https://www.lucacambiaghi.com/vanilla-emacs/readme.html#h:7BA73F60-D31F-4A96-9DEE-02A4FC1BEE8B
+;; zmq installation:
+
+;; Need to have automake, autoconf
+;; In straight/build/zmq/src run autoreconf -i
+;; In straight/build/zmq run make
+;; emacs-zmq installation:
+
+;; In straight/build/emacs-zmq run wget https://github.com/nnicandro/emacs-zmq/releases/download/v0.10.10/emacs-zmq-x86_64-apple-darwin17.4.0.tar.gz
+;; Then tar -xzf emacs-zmq-x86_64-apple-darwin17.4.0.tar.gz
+;; Finally cp emacs-zmq-x86_64-apple-darwin17.4.0/emacs-zmq.so emacs-zmq.dylib
+(use-package zmq)
+(use-package jupyter)
+(use-package flymake-ruff
+  :ensure t
+  :hook (python-mode . flymake-ruff-load))
+
+(remove-hook 'flymake-diagnostic-functions 'lsp-diagnostics--flymake-backend 'python-flymake)
+
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+(use-package flycheck-vale
+  :init (flycheck-vale-setup))
+
+(use-package yasnippet
+  :init (yas-global-mode))
+
+(use-package yasnippet-snippets)
 
 
 ;; init.el ends here
