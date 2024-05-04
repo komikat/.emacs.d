@@ -9,18 +9,19 @@
       (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-	(url-retrieve-synchronously
-	 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-	 'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
+     (url-retrieve-synchronously
+      "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+      'silent 'inhibit-cookies)
+     (goto-char (point-max))
+     (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
 ;; install use-package
 (straight-use-package 'use-package)
 
+
 ;; custom file setup -- needed for some reason
-(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(defvar custom-file (locate-user-emacs-file "custom-vars.el"))
 (load custom-file 'noerror 'nomessage)
 
 ;; Configure use-package to use straight.el by default
@@ -28,9 +29,7 @@
   :custom
   (straight-use-package-by-default t))
 
-(use-package exec-path-from-shell)
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
+
 
 (use-package auctex
   :defer t)
@@ -43,7 +42,7 @@
 (use-package vertico
   :init
   (vertico-mode)
-  :config (setq vertico-preselect 'first))
+  :config (defvar vertico-preselect 'first))
 
 (use-package savehist
   :init
@@ -51,15 +50,15 @@
 
 (use-package modus-themes
   :init
-  (setq modus-themes-italic-constructs t
-        modus-themes-bold-constructs nil
-        modus-themes-region '(bg-only no-extend))
-  (setq modus-themes-common-palette-overrides
+  (defvar modus-themes-italic-constructs t)
+  (defvar modus-themes-bold-constructs nil)
+  (defvar modus-themes-region '(bg-only no-extend))
+  (defvar modus-themes-common-palette-overrides
         '((fg-prompt cyan)
           (bg-prompt bg-cyan-nuanced)))
   :config
-  (setq modus-themes-to-toggle '(modus-vivendi modus-operandi-tritanopia))
-  (setq modus-themes-prompts '(regular))
+  (defvar modus-themes-to-toggle '(modus-vivendi modus-operandi-tritanopia))
+  (defvar modus-themes-prompts '(regular))
   (set-face-attribute 'default nil
                       :font "Hasklig")
   (load-theme 'modus-vivendi)
@@ -80,17 +79,17 @@
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
+  (defvar minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
   ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
   ;; Vertico commands are hidden in normal buffers.
-  ;; (setq read-extended-command-predicate
+  ;; (defvar read-extended-command-predicate
   ;;       #'command-completion-default-include-p)
 
   ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t)
+  (defvar enable-recursive-minibuffers t)
   :config
   ;; THEME BEGIN
 
@@ -98,8 +97,8 @@
 
   ;; basic cosmetic changes
   (pixel-scroll-precision-mode t)     ; emacs 29 - in the future now
-  (setq ring-bell-function 'ignore)   ; so annoying
-  (setq inhibit-startup-message t)    ; ^^
+  (defvar ring-bell-function 'ignore)   ; so annoying
+  (defvar inhibit-startup-message t)    ; ^^
   (scroll-bar-mode -1)                ; the scroll thing on the right
   (tooltip-mode -1)                   ; eh
   (fringe-mode 0)                     ; the fringe
@@ -110,31 +109,30 @@
   (global-hl-line-mode -1)            ; on the fence
   (show-paren-mode t)                 ; NEED
   (global-display-line-numbers-mode t) ; do i REALLY need line numbers? not sure.
-  (setq display-line-numbers-type 'relative)
+  (defvar display-line-numbers-type 'relative)
 
   ;; tab width stuff
   (setq-default indent-tabs-mode nil)   ; use spaces!
   (setq-default tab-width 4)            ; 4 spaces for 1 tab
-  (setq tab-width 4)
+  (defvar tab-width 4)
 
   ;; mac keybinds
-  (setq mac-option-modifier 'super
-        mac-command-modifier 'meta
-        mac-right-option-modifier 'none)
-  
+  (defvar mac-option-modifier 'super)
+  (defvar mac-command-modifier 'meta)
+  (defvar mac-right-option-modifier 'none)
   :hook (emacs-startup . (lambda ()
                            (custom-set-faces
-                            '(line-number ((t (:inherit default :font "Hasklig")))))))
-  )
+                            '(line-number ((t (:inherit default :font "Hasklig"))))))))
+  
 
 
  
 
 (use-package orderless
   :init
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  (defvar completion-styles '(orderless basic))
+  (defvar completion-category-defaults nil)
+  (defvar completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map
@@ -155,39 +153,10 @@
          ("M-s k" . consult-keep-lines)))
 ;;; CONSULT END
 
-;;; TREE SITTER BEGIN
-(setq treesit-language-source-alist
-   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-     (cmake "https://github.com/uyha/tree-sitter-cmake")
-     (css "https://github.com/tree-sitter/tree-sitter-css")
-     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-     (go "https://github.com/tree-sitter/tree-sitter-go")
-     (html "https://github.com/tree-sitter/tree-sitter-html")
-     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-     (json "https://github.com/tree-sitter/tree-sitter-json")
-     (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-     (python "https://github.com/tree-sitter/tree-sitter-python")
-     (toml "https://github.com/tree-sitter/tree-sitter-toml")
-     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-	 (haskell "https://github.com/tree-sitter/tree-sitter-haskell")
-	 (c "https://github.com/tree-sitter/tree-sitter-c")
-     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-(setq major-mode-remap-alist
- '((yaml-mode . yaml-ts-mode)
-   (bash-mode . bash-ts-mode)
-   (js2-mode . js-ts-mode)
-   (typescript-mode . typescript-ts-mode)
-   (json-mode . json-ts-mode)
-   (css-mode . css-ts-mode)
-   (python-mode . python-ts-mode)
-   (c-mode . c-ts-mode)))
-;;; TREE SITTER END
 
-(setq python-shell-interpreter "ipython"
-      python-shell-interpreter-args "-i --simple-prompt")
+(defvar python-shell-interpreter "ipython")
+(defvar python-shell-interpreter-args "-i --simple-prompt")
 
 (use-package which-key
   :init (which-key-mode 1))
@@ -203,50 +172,30 @@
               ("C-c C-d" . eldoc)
               ("C-c C-e" . eglot-rename)
               ("C-c C-o" . python-sort-imports)
-              ("C-c C-f" . eglot-format-buffer))
-  :hook ((python-mode . eglot-ensure)
-         (python-mode . flyspell-prog-mode)
-         (python-mode . superword-mode)
-         (python-mode . hs-minor-mode)
-         (python-mode . (lambda () (set-fill-column 88))))
-  :config
-  (setq-default eglot-workspace-configuration
-                '((:pylsp . (:configurationSources ["flake8"]
-                             :plugins (
-                                       :pycodestyle (:enabled :json-false)
-                                       :mccabe (:enabled :json-false)
-                                       :pyflakes (:enabled :json-false)
-                                       :flake8 (:enabled :json-false
-                                                :maxLineLength 88)
-                                       :ruff (:enabled t
-                                              :lineLength 88)
-                                       :pydocstyle (:enabled t
-                                                    :convention "numpy")
-                                       :yapf (:enabled :json-false)
-                                       :autopep8 (:enabled :json-false)
-                                       :black (:enabled t
-                                               :line_length 88
-                                               :cache_config t)))))))
+              ("C-c C-f" . eglot-format-buffer)))
 
 (use-package racket-mode
   :hook (racket-mode . racket-xp-mode)
   :config
-  (setq racket-eldoc-function 'racket-xp-eldoc-function))
+  (defvar racket-eldoc-function 'racket-xp-eldoc-function))
 
-(use-package paredit
-  :ensure t
-  :config
-  (dolist (m '(emacs-lisp-mode-hook
-               racket-mode-hook
-               racket-repl-mode-hook))
-    (add-hook m #'paredit-mode))
-  (bind-keys :map paredit-mode-map
-             ("{"   . paredit-open-curly)
-             ("}"   . paredit-close-curly))
-  (unless terminal-frame
-    (bind-keys :map paredit-mode-map
-               ("M-[" . paredit-wrap-square)
-               ("M-{" . paredit-wrap-curly))))
+;; moved to parinfer
+
+;; (use-package paredit
+;;   :ensure t
+;;   :config
+;;   (dolist (m '(emacs-lisp-mode-hook
+;;                racket-mode-hook
+;;                racket-repl-mode-hook))
+;;     (add-hook m #'paredit-mode))
+;;   (bind-keys :map paredit-mode-map
+;;              ("{"   . paredit-open-curly)
+;;              ("}"   . paredit-close-curly))
+;;   (unless terminal-frame
+;;     (bind-keys :map paredit-mode-map
+;;                ("M-[" . paredit-wrap-square)
+;;                ("M-{" . paredit-wrap-curly))))
+
 (use-package eros
   :config
   (eros-mode 1))
@@ -254,7 +203,10 @@
 (use-package projectile
   :init
   (projectile-mode +1)
-  (setq projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2) ("/Users/akshitkr/Library/Mobile Documents/com~apple~CloudDocs/Documents/College/" . 3)))
+  (defvar projectile-project-search-path '("~/.emacs.d/"
+                                           ("~/Developer/" . 2)
+                                           ("~/Documents/stuff" . 6)
+                                           ("/Users/akshitkr/Library/Mobile Documents/com~apple~CloudDocs/Documents/College/" . 3)))
   :bind (:map projectile-mode-map
               ("M-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
@@ -274,31 +226,31 @@
 (use-package rainbow-delimiters
   :config
   (rainbow-delimiters-mode t)
-  :hook (prog-mode . rainbow-delimiters-mode)
-  )
+  :hook (prog-mode . rainbow-delimiters-mode))
+  
 
 (use-package bufler
   :init (bufler-mode)
-  :bind ("C-x C-b" . bufler)
-)
+  :bind ("C-x C-b" . bufler))
+
 
 ;; elfeed config
 (use-package elfeed
   :bind ("C-x w" . elfeed)
   :init ;; Somewhere in your .emacs file
-  (setq elfeed-feeds
+  (defvar elfeed-feeds
       '(("http://nullprogram.com/feed/" blog emacs)
         ("https://www.reddit.com/user/nxlyd/m/compsci.rss")
-        ("https://hnrss.org/frontpage"))
-      )
-  )
+        ("https://hnrss.org/frontpage"))))
+      
+  
 
 (use-package devdocs
   :bind ("C-h D" . devdocs-lookup))
 
 (use-package gptel
   :config
-  (setq gptel-api-key (getenv "OPENAPI")))
+  (defvar gptel-api-key (getenv "OPENAPI")))
 
 (use-package solaire-mode
   :hook (after-init . solaire-global-mode))
@@ -316,12 +268,12 @@
 (load "~/.emacs.d/.ercpass")
 (use-package erc
   :config
-  (setq erc-prompt-for-nickserv-password nil)
-  (setq erc-nickserv-passwords
+  (defvar erc-prompt-for-nickserv-password nil)
+  (defvar erc-nickserv-passwords
         `((freenode     (("komikat" . ,freenode-nickone-pass)))))
-  (setq erc-nick "komikat"
-        erc-user-full-name "Akshit Kumar")
-  )
+  (defvar erc-nick "komikat")
+  (defvar erc-user-full-name "Akshit Kumar"))
+  
 
 (defun connect-znc ()
   (interactive)
@@ -351,13 +303,13 @@
 
 (use-package lsp-mode
   :init
-  (setq lsp-keymap-prefix "C-c l")
+  (defvar lsp-keymap-prefix "C-c l")
   :hook ((lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
 
 (use-package lsp-haskell
   :config
-  (setq lsp-haskell-server-path "/Users/akshitkr/.ghcup/bin/haskell-language-server-wrapper"))
+  (defvar lsp-haskell-server-path "/Users/akshitkr/.ghcup/bin/haskell-language-server-wrapper"))
 
 (use-package lsp-ui)
 (use-package moody)
@@ -375,12 +327,6 @@
 ;; Finally cp emacs-zmq-x86_64-apple-darwin17.4.0/emacs-zmq.so emacs-zmq.dylib
 (use-package zmq)
 (use-package jupyter)
-(use-package flymake-ruff
-  :ensure t
-  :hook (python-mode . flymake-ruff-load))
-
-(remove-hook 'flymake-diagnostic-functions 'lsp-diagnostics--flymake-backend 'python-flymake)
-
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
@@ -392,6 +338,49 @@
   :init (yas-global-mode))
 
 (use-package yasnippet-snippets)
+(use-package ruff-format)
+(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
+(use-package reformatter)
+
+(setq-default flycheck-disabled-checkers '(python-mypy))
+
+(defvar company-dabbrev-downcase 0)
+(defvar company-idle-delay 0)
+
+(use-package avy
+  :config
+  (avy-setup-default)
+  (global-set-key (kbd "C-c C-j") 'avy-resume)
+  (global-set-key (kbd "C-;") 'avy-goto-char-timer))
+
+(defun my-turn-off-line-numbers ()
+  "Disable line numbering in the current buffer."
+  (display-line-numbers-mode -1))
+
+(add-hook 'pdf-view-mode-hook #'my-turn-off-line-numbers)
 
 
+
+(use-package parinfer-rust-mode
+    :hook emacs-lisp-mode
+    :init
+    (defvar parinfer-rust-auto-download t))
+
+
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp))))
+
+(use-package treesit-auto
+  :demand t
+  :config
+  (global-treesit-auto-mode))
+
+(use-package keyfreq)
+(use-package command-log-mode)
+
+(use-package elixir-mode
+  :ensure t)
 ;; init.el ends here
