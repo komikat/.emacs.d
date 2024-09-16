@@ -18,20 +18,12 @@
   (load bootstrap-file nil 'nomessage))
 
 (use-package straight
-  :custom
-  (straight-use-package-by-default t))
-
-;; general packages setup
-(use-package ctrlf
-  :commands (ctrlf-mode)
   :init
-  (ctrlf-mode t))
+  (setq straight-use-package-by-default t))
 
 (use-package vertico
-  :commands (vertico-mode)
   :init
   (vertico-mode)
-  (defvar vertico-preselect)
   :config (setq vertico-preselect 'first))
 
 (use-package savehist
@@ -66,11 +58,7 @@
   ;; mac keybinds
   (setq mac-option-modifier 'super
         mac-command-modifier 'meta
-        mac-right-option-modifier 'none)
-  
-  :hook (emacs-startup . (lambda ()
-                           (custom-set-faces
-                            '(line-number ((t (:inherit default :font "Hasklig"))))))))
+        mac-right-option-modifier 'none))
 
 (use-package orderless
   :init
@@ -81,7 +69,6 @@
 (use-package marginalia
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
-  :commands (marginalia-mode)
   :init
   (marginalia-mode))
 
@@ -96,20 +83,15 @@
          ("M-s k" . consult-keep-lines)))
 
 (use-package which-key
-  :commands (which-key-mode)
   :init (which-key-mode 1))
 
 (use-package company
-  :commands (global-company-mode)
   :init (global-company-mode 1))
 
 (use-package projectile
-  :commands (projectile-mode)
   :init
-  (defvar projectile-project-search-path)
-  (defvar projectile-mode-map)
   (projectile-mode +1)
-  (setq projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2) ("/Users/akshitkr/Library/Mobile Documents/com~apple~CloudDocs/Documents/College/" . 3)))
+  (setq projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2) ("/Users/akshitkr/Library/Mobile\ Documents/com~apple~CloudDocs/Documents/stuff/" . 4)))
   :bind (:map projectile-mode-map
               ("M-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
@@ -123,55 +105,28 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package bufler
-  :commands (bufler-mode)
   :config (bufler-mode)
   :bind ("C-x C-b" . bufler))
 
-(use-package solaire-mode
-  :hook (after-init . solaire-global-mode))
-
 (use-package golden-ratio
-  :commands (golden-ratio-mode)
   :config
   (golden-ratio-mode 1))
 
 (use-package spacious-padding
-  :commands (spacious-padding-mode)
   :config
   (spacious-padding-mode 1))
 
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
-
 (use-package yasnippet
-  :commands (yas-global-mode)
   :init (yas-global-mode))
-
 (use-package yasnippet-snippets)
-
-(use-package eglot)
-
-(use-package flycheck-eglot
-  :commands (global-flycheck-eglot-mode)
-  :after (flycheck eglot)
-  :config
-  (global-flycheck-eglot-mode 1))
-
-;; theme
-(use-package doom-themes
-  :commands (doom-themes-org-config)
-  :init
-  (defvar doom-themes-enable-bold nil)
-  (defvar doom-themes-enable-italic nil)
-  :config
-  ;; i like meltbus and homage
-  (load-theme 'doom-homage-black t)
-  (doom-themes-org-config))
 
 ;; Language setup
 (use-package haskell-mode)
 (use-package auctex)
+(use-package pyvenv)
+(add-to-list 'default-frame-alist
+             '(font . "-*-SF Mono-regular-normal-normal-*-*-*-*-*-m-0-iso10646-1"))
+
 
 (provide 'init)
 ;;; init.el ends here
