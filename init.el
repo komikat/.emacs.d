@@ -32,7 +32,7 @@
 (use-package vertico
   :init
   (vertico-mode)
-  :config (setq vertico-preselect 'first))
+  :config (defvar vertico-preselect 'first))
 
 (use-package savehist
   :init
@@ -40,9 +40,9 @@
 
 (use-package orderless
   :init
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  (defvar completion-styles '(orderless basic))
+  (defvar completion-category-defaults nil)
+  (defvar completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map
@@ -59,6 +59,7 @@
          ("M-g k" . consult-global-mark)
          ("M-s r" . consult-ripgrep)
          ("M-s k" . consult-keep-lines)))
+
 
 (use-package which-key
   :init (which-key-mode 1))
@@ -94,9 +95,30 @@
   :config
   (spacious-padding-mode 1))
 
+
 (use-package yasnippet
   :init (yas-global-mode))
 (use-package yasnippet-snippets)
+(use-package ruff-format)
+(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
+(use-package reformatter)
+
+(setq-default flycheck-disabled-checkers '(python-mypy))
+
+(defvar company-dabbrev-downcase 0)
+(defvar company-idle-delay 0)
+
+(use-package avy
+  :config
+  (avy-setup-default)
+  (global-set-key (kbd "C-c C-j") 'avy-resume)
+  (global-set-key (kbd "C-;") 'avy-goto-char-timer))
+
+(defun my-turn-off-line-numbers ()
+  "Disable line numbering in the current buffer."
+  (display-line-numbers-mode -1))
+
+(add-hook 'pdf-view-mode-hook #'my-turn-off-line-numbers)
 
 ;; Language setup
 (use-package haskell-mode)
