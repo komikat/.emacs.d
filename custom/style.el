@@ -1,4 +1,4 @@
-;;; style.el --- basic styling for emacs
+;;; style.el --- styles for my emacs config
 
 (setq mac-option-modifier 'super
       mac-command-modifier 'meta
@@ -12,6 +12,7 @@
                 menu-bar-mode
                 recentf-mode
                 delete-selection-mode
+                global-display-line-numbers-mode
                 show-paren-mode))
   (funcall mode t))
 (dolist (mode '(scroll-bar-mode
@@ -23,5 +24,19 @@
 (load-theme 'modus-vivendi t)
 (add-to-list 'default-frame-alist
              '(font . "-*-SF Mono-regular-normal-normal-*-*-*-*-*-m-0-iso10646-1"))
+
+(use-package rainbow-delimiters
+  :config
+  (rainbow-delimiters-mode t)
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package golden-ratio
+  :config
+  (golden-ratio-mode 1))
+
+(use-package spacious-padding
+  :config
+  (spacious-padding-mode 1))
+
 
 (provide 'style)
