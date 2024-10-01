@@ -1,19 +1,19 @@
 ;;; complete.el --- setup completion packages
 
 (use-package vertico
-  :init
-  (vertico-mode)
-  :config (defvar vertico-preselect 'first))
+  :init (vertico-mode)
+  :config (setopt vertico-preselect 'first))
+
 
 (use-package savehist
   :init
   (savehist-mode))
 
 (use-package orderless
-  :init
-  (defvar completion-styles '(orderless basic))
-  (defvar completion-category-defaults nil)
-  (defvar completion-category-overrides '((file (styles partial-completion)))))
+  :config
+  (setopt completion-styles '(orderless basic))
+  (setopt completion-category-defaults nil)
+  (setopt completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map
