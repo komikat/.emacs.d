@@ -49,7 +49,7 @@
   :config
   (load-theme 'zenburn t))
 (add-to-list 'default-frame-alist
-             '(font . "-*-Inconsolata-regular-normal-normal-*-*-*-*-*-m-0-iso10646-1"))
+             '(font . "-*-Inconsolata-medium-normal-normal-*-*-*-*-*-p-0-iso10646-1"))
 (use-package rainbow-delimiters
   :config
   (rainbow-delimiters-mode t)
@@ -100,7 +100,7 @@
 ;;; PROJECTS
 (use-package projectile
   :init
-  (setopt projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2) ("~/Documents/stuff/" . 4)))
+  (setopt projectile-project-search-path '("~/.emacs.d/" ("~/Developer/" . 2) ("~/Documents/stuff/" . 4) ("~/Developer" . 2)))
   (projectile-mode +1)
   :bind (:map projectile-mode-map
               ("M-p" . projectile-command-map)
@@ -150,28 +150,24 @@
   (erc-sasl-use-sasl t))
 (use-package racket-mode)
 (use-package gptel
-  :straight (:host github :repo "karthink/gptel" :tag "v0.9.8")
+  :straight (gptel :type git :host github :repo "karthink/gptel" :branch "master")
   :config
-  ;; Common key retrieval function
-  (defun get-api-key (host)
-    "Retrieve API key from .authinfo for specified HOST."
-    (let ((auth-info (auth-source-search :host host
-                                         :require '(:secret))))
-      (when auth-info
-        (let ((secret (plist-get (car auth-info) :secret)))
-          (if (functionp secret)
-              (funcall secret)
-            secret)))))
-  ;; New Anthropic configuration
-  (gptel-make-anthropic "Anthropic"
-    :key (get-api-key "api.anthropic.com")
+  (setq gptel-backend (gptel-make-anthropic "Anthropic"
+                        :key (gptel-api-key-from-auth-source "api.anthropic.com")
+                        :models '(claude-3-7-sonnet-latest claude-3-5-sonnet-latest claude-3-5-haiku-latest claude-3-opus-latest)
+                        :stream t))
+  (gptel-make-anthropic "Claude-thinking"
+    :key (gptel-api-key-from-auth-source "api.anthropic.com")
     :stream t
-    :models '(claude-3-opus-latest
-              claude-3-5-haiku-latest
-              claude-3-7-sonnet-latest
-              claude-3-5-sonnet-latest))
-  (setq gptel-model 'claude-3-5-haiku-latest)
+    :models '(claude-3-7-sonnet-20250219)
+    :header (lambda () (when-let* ((key (gptel--get-api-key)))
+                         `(("x-api-key" . ,key)
+                           ("anthropic-version" . "2023-06-01")
+                           ("anthropic-beta" . "pdfs-2024-09-25")
+                           ("anthropic-beta" . "output-128k-2025-02-19")
+                           ("anthropic-beta" . "prompt-caching-2024-07-31"))))
+    :request-params '(:thinking (:type "enabled" :budget_tokens 2048)
+                                :max_tokens 4096))
   (setq gptel-include-reasoning t))
-
 (provide 'init)
 ;;; init.el ends here
