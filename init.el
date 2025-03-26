@@ -169,5 +169,18 @@
     :request-params '(:thinking (:type "enabled" :budget_tokens 2048)
                                 :max_tokens 4096))
   (setq gptel-include-reasoning t))
+(use-package org-fragtog
+  :hook (org-mode . org-fragtog-mode)
+  :config
+  ;; Increase scale (1.5 = 150% of default size)
+  (setq org-format-latex-options 
+        (plist-put org-format-latex-options :scale 1.5))
+  
+  ;; Improve resolution (adjust dpi higher for sharper images)
+  (setq org-preview-latex-default-process 'dvisvgm) ;; Use SVG for better quality
+  (setq org-format-latex-options
+        (plist-put org-format-latex-options :dpi 300)))
+
+
 (provide 'init)
 ;;; init.el ends here
