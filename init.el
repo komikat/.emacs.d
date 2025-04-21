@@ -49,7 +49,7 @@
   :config
   (load-theme 'zenburn t))
 (add-to-list 'default-frame-alist
-             '(font . "-*-Inconsolata-medium-normal-normal-*-*-*-*-*-p-0-iso10646-1"))
+             '(font . "-*-Source Code Pro-regular-normal-normal-*-*-*-*-*-m-0-iso10646-1"))
 (use-package rainbow-delimiters
   :config
   (rainbow-delimiters-mode t)
