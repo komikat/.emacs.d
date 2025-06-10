@@ -18,6 +18,9 @@
 (use-package straight
   :init
   (setq straight-use-package-by-default t))
+(straight-use-package '(project :type built-in))
+(use-package xref
+  :straight t)
 (use-package exec-path-from-shell
   :config
   (when (memq window-system '(mac ns x))
@@ -45,15 +48,12 @@
                 tool-bar-mode
                 global-hl-line-mode))
   (funcall mode -1))
-(use-package zenburn-theme
+(use-package modus-themes
   :config
-  (load-theme 'zenburn t))
-(add-to-list 'default-frame-alist
+  (add-to-list 'default-frame-alist
              '(font . "-*-Source Code Pro-regular-normal-normal-*-*-*-*-*-m-0-iso10646-1"))
-(use-package rainbow-delimiters
-  :config
-  (rainbow-delimiters-mode t)
-  :hook (prog-mode . rainbow-delimiters-mode))
+  (load-theme 'modus-vivendi t))
+
 (use-package golden-ratio
   :config
   (golden-ratio-mode 1))
@@ -135,40 +135,23 @@
   :config
   (pdf-tools-install)
   :hook (pdf-view-mode . (lambda () "turn off line numbers" (display-line-numbers-mode -1))))
-(use-package erc
-  :config
-  (setopt erc-modules
-          (seq-union '(sasl scrolltobottom services)
-                     erc-modules))
-  (setopt erc-use-auth-source-for-nickserv-password t)
-  (setopt erc-nickserv-passwords
-          `((libera (("komikat" . ,(auth-source-pick-first-password
-                                    :host "irc.libera.chat"
-                                    :user "komikat"))))))
-  (setopt erc-sasl-user "komikat")
-  :custom
-  (erc-sasl-use-sasl t))
+
 (use-package racket-mode)
 (use-package gptel
   :straight (gptel :type git :host github :repo "karthink/gptel" :branch "master")
   :config
-  (setq gptel-backend (gptel-make-anthropic "Anthropic"
+  (gptel-make-anthropic "Anthropic"
                         :key (gptel-api-key-from-auth-source "api.anthropic.com")
-                        :models '(claude-3-7-sonnet-latest claude-3-5-sonnet-latest claude-3-5-haiku-latest claude-3-opus-latest)
-                        :stream t))
-  (gptel-make-anthropic "Claude-thinking"
-    :key (gptel-api-key-from-auth-source "api.anthropic.com")
-    :stream t
-    :models '(claude-3-7-sonnet-20250219)
-    :header (lambda () (when-let* ((key (gptel--get-api-key)))
-                         `(("x-api-key" . ,key)
-                           ("anthropic-version" . "2023-06-01")
-                           ("anthropic-beta" . "pdfs-2024-09-25")
-                           ("anthropic-beta" . "output-128k-2025-02-19")
-                           ("anthropic-beta" . "prompt-caching-2024-07-31"))))
-    :request-params '(:thinking (:type "enabled" :budget_tokens 2048)
-                                :max_tokens 4096))
-  (setq gptel-include-reasoning t))
+                        :stream t)
+  (setq gptel-include-reasoning t)
+  (gptel-make-openai "TogetherAI"
+    :host "api.together.xyz"
+    :key (gptel-api-key-from-auth-source "api.together.xyz")
+    :models '(meta-llama/Llama-4-Scout-17B-16E-Instruct deepseek-ai/DeepSeek-R1 Qwen/QwQ-32B)
+    :stream t))
+
+
+
 (use-package org-fragtog
   :hook (org-mode . org-fragtog-mode)
   :config
@@ -180,7 +163,38 @@
   (setq org-preview-latex-default-process 'dvisvgm) ;; Use SVG for better quality
   (setq org-format-latex-options
         (plist-put org-format-latex-options :dpi 300)))
+(use-package json-navigator)
 
+(use-package eglot
+  :straight t
+  :ensure t
+  :hook ((prog-mode . eglot-ensure))
+  :config
+  ;; Server configuration
+  (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
+  
+  ;; Performance settings
+  (setq eglot-events-buffer-size 0)  ; Disable events buffer
+  (setq eglot-sync-connect nil)      ; Connect asynchronously
+  (setq eglot-events-buffer-size 0)       ; Disable events buffer completely
+  (setq eglot-keep-workspace-alive nil)   ; Kill language server when last buffer closed
+  
+;; Reduce CPU usage
+  (setq eglot-extend-to-xref nil)         ; Don't analyze non-project files
+  (setq eglot-ignored-server-capabilities '(:documentHighlightProvider
+                                          :documentFormattingProvider
+                                          :documentRangeFormattingProvider
+                                          :documentOnTypeFormattingProvider
+                                          :colorProvider
+                                          :foldingRangeProvider))
+
+  ;; Improve responsiveness
+  (setq read-process-output-max (* 1024 1024)) ; Increase read chunk size (1MB)
+  (setq eglot-connect-timeout 10)         ; Fail fast if server doesn't respond
+
+  ;; LSP session management
+  (setq eglot-autoshutdown t)             ; Shutdown unused language servers
+)
 
 (provide 'init)
 ;;; init.el ends here
